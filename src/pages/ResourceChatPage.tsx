@@ -31,9 +31,14 @@ import {
   Check,
   CheckCheck,
   ChevronRight,
+  CircleEllipsis,
   CircleHelp,
   ClipboardCheck,
+  CloudLightning,
   FileImage,
+  GraduationCap,
+  HandCoins,
+  HeartPulse,
   Landmark,
   Leaf,
   Link2,
@@ -42,6 +47,7 @@ import {
   Send,
   ShieldCheck,
   Sparkles,
+  Sprout,
   TriangleAlert,
   Wind,
   X,
@@ -54,14 +60,19 @@ import {
   useRef,
   useState,
 } from "react";
+import { Link as RouterLink, useSearchParams } from "react-router-dom";
 import { StudentShell } from "@/components/layout/StudentShell";
+import { resourceCategories } from "@/data/demo";
+import { getResourceScenario, getScenarioReply, type ResourceCategory, type ResourceScenario } from "@/data/resourceScenarios";
 
-const documentItems = [
-  "申請人的身分證明與印章",
-  "農地位置、地段或使用證明",
-  "能看出作物與受損範圍的照片",
-  "所在地公所要求的其他證明",
-];
+const scenarioIcons = {
+  disaster: CloudLightning,
+  agriculture: Sprout,
+  education: GraduationCap,
+  economy: HandCoins,
+  health: HeartPulse,
+  other: CircleEllipsis,
+} satisfies Record<ResourceCategory, typeof Sprout>;
 
 type MemoryChoice = "remembered" | "declined" | null;
 
@@ -191,9 +202,11 @@ function RequirementRow({
 }
 
 function ResourceRecommendationCard({
+  scenario,
   onOpenChecklist,
   onOpenSource,
 }: {
+  scenario: ResourceScenario;
   onOpenChecklist: () => void;
   onOpenSource: () => void;
 }) {
@@ -220,7 +233,7 @@ function ResourceRecommendationCard({
               <Icon as={Sparkles} boxSize="12px" color="warning" fill="#F6A63C" />
             </HStack>
             <Text mt="1px" fontSize="14px" color="navy.800" fontWeight={800} lineHeight="1.45">
-              我找到一個可能適合你們的資源
+              {scenario.intro}
             </Text>
           </Box>
         </HStack>
@@ -243,26 +256,32 @@ function ResourceRecommendationCard({
               fontWeight={800}
               letterSpacing=".02em"
             >
-              可能符合
+              {scenario.status}
             </Badge>
             <Text id="resource-title" as="h1" fontSize={{ base: "20px", sm: "21px" }} color="navy.900" fontWeight={800} lineHeight="1.4">
-              農業天然災害救助
+              {scenario.title}
             </Text>
             <Text mt="5px" fontSize="12px" color="#728491" lineHeight="1.55">
-              初步條件比對結果，並非核定通知
+              依示範情境整理，實際需求與資格待確認
             </Text>
           </Box>
-          <PlantIllustration />
+          {scenario.key === "agriculture" ? (
+            <PlantIllustration />
+          ) : (
+            <Circle size="76px" flexShrink={0} bg={scenario.background} color={scenario.color} aria-hidden="true">
+              <Icon as={scenarioIcons[scenario.key]} boxSize="40px" strokeWidth={1.8} />
+            </Circle>
+          )}
         </Flex>
 
         <Box mt="17px">
           <Text mb="10px" fontSize="14px" color="navy.800" fontWeight={800}>
-            為什麼可能符合？
+            {scenario.status === "待確認需求" ? "可以先從這裡開始" : "為什麼可能符合？"}
           </Text>
           <Stack spacing="9px">
-            <RequirementRow kind="matched">家裡有從事農業或照顧菜園</RequirementRow>
-            <RequirementRow kind="matched">颱風造成蔬菜與農作物受損</RequirementRow>
-            <RequirementRow kind="confirm">需確認菜園所在地是否列入公告區域</RequirementRow>
+            {scenario.requirements.map((requirement) => (
+              <RequirementRow key={requirement.text} kind={requirement.kind}>{requirement.text}</RequirementRow>
+            ))}
           </Stack>
         </Box>
 
@@ -284,10 +303,10 @@ function ResourceRecommendationCard({
             </Circle>
             <Box>
               <Text fontSize="13px" color="#724619" fontWeight={700} lineHeight="1.55">
-                是否仍在所在地公告的受理期限內
+                {scenario.confirmationTitle}
               </Text>
               <Text mt="2px" fontSize="11.5px" color="#8B6742" lineHeight="1.55">
-                期限會依災害、作物與地區不同，請向公所確認。
+                {scenario.confirmationDescription}
               </Text>
             </Box>
           </HStack>
@@ -305,7 +324,7 @@ function ResourceRecommendationCard({
           <HStack spacing="8px" align="flex-start">
             <Icon as={Landmark} mt="2px" boxSize="14px" color="brand.600" />
             <Text fontSize="11.5px" color="#637987" lineHeight="1.55">
-              政策機關：<Text as="span" color="navy.700" fontWeight={700}>農業部</Text>　申請窗口：所在地公所
+              資源機關：<Text as="span" color="navy.700" fontWeight={700}>{scenario.agency}</Text>　洽詢窗口：{scenario.applicationWindow}
             </Text>
           </HStack>
           <HStack spacing="8px" align="flex-start">
@@ -347,9 +366,11 @@ function ResourceRecommendationCard({
 }
 
 function MemorySuggestion({
+  label,
   choice,
   onChoose,
 }: {
+  label: string;
   choice: MemoryChoice;
   onChoose: (choice: Exclude<MemoryChoice, null>) => void;
 }) {
@@ -371,7 +392,7 @@ function MemorySuggestion({
         </Circle>
         <Box>
           <Text fontSize="13px" color="navy.700" fontWeight={700}>
-            {remembered ? "已在這次示範中記住「家裡從事農業」" : "好，我不會記住這項資訊"}
+            {remembered ? `已在這次示範中記住「${label}」` : "好，我不會記住這項資訊"}
           </Text>
           {remembered && (
             <Text mt="2px" fontSize="11.5px" color="#6E828F">
@@ -399,7 +420,7 @@ function MemorySuggestion({
         </Circle>
         <Box flex="1">
           <Text fontSize="13.5px" color="navy.800" fontWeight={800} lineHeight="1.5">
-            要讓我記得「家裡從事農業」嗎？
+            要讓我記得「{label}」嗎？
           </Text>
           <Text mt="3px" fontSize="11.5px" color="#6C808D" lineHeight="1.55">
             只有你同意後才會記住；示範資料只保留在本頁。
@@ -419,14 +440,16 @@ function MemorySuggestion({
 }
 
 function ChecklistModal({
+  scenario,
   isOpen,
   onClose,
 }: {
+  scenario: ResourceScenario;
   isOpen: boolean;
   onClose: () => void;
 }) {
   const toast = useToast();
-  const [prepared, setPrepared] = useState(() => documentItems.map(() => false));
+  const [prepared, setPrepared] = useState(() => scenario.documents.map(() => false));
   const allPrepared = prepared.every(Boolean);
 
   const togglePrepared = (index: number) => {
@@ -436,7 +459,7 @@ function ChecklistModal({
   const finish = () => {
     toast({
       title: "資料清單已確認",
-      description: "下一步請向菜園所在地的公所確認公告與期限。",
+      description: scenario.nextStep,
       status: "success",
       duration: 3200,
       isClosable: true,
@@ -446,19 +469,19 @@ function ChecklistModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isCentered size="sm" motionPreset="slideInBottom">
+    <Modal isOpen={isOpen} onClose={onClose} isCentered size="sm" motionPreset="slideInBottom" scrollBehavior="inside">
       <ModalOverlay bg="rgba(9,36,60,.42)" backdropFilter="blur(3px)" />
-      <ModalContent mx="16px" borderRadius="20px" overflow="hidden">
+      <ModalContent mx="16px" maxH="calc(100dvh - 32px)" borderRadius="20px" overflow="hidden">
         <ModalHeader pb="8px" color="navy.900" fontSize="19px">
           先準備這些資料
         </ModalHeader>
         <ModalCloseButton aria-label="關閉資料清單" top="12px" right="12px" />
         <ModalBody pb="8px">
           <Text fontSize="12.5px" color="#697F8D" lineHeight="1.65">
-            以下是常見準備項目。實際文件會依地區與公告不同，送件前請再向所在地公所確認。
+            {scenario.checklistDescription}
           </Text>
           <Stack mt="15px" spacing="9px">
-            {documentItems.map((item, index) => (
+            {scenario.documents.map((item, index) => (
               <Checkbox
                 key={item}
                 alignItems="flex-start"
@@ -483,7 +506,7 @@ function ChecklistModal({
           <HStack mt="14px" p="10px 11px" bg="#FFF8EA" borderRadius="11px" align="flex-start">
             <Icon as={TriangleAlert} mt="2px" boxSize="14px" color="#CF7A12" flexShrink={0} />
             <Text fontSize="11.5px" color="#7A582E" lineHeight="1.55">
-              先拍照保留受損狀況，但不要為了拍照進入危險區域。
+              {scenario.checklistNote}
             </Text>
           </HStack>
         </ModalBody>
@@ -501,9 +524,11 @@ function ChecklistModal({
 }
 
 function GovernmentSourceModal({
+  scenario,
   isOpen,
   onClose,
 }: {
+  scenario: ResourceScenario;
   isOpen: boolean;
   onClose: () => void;
 }) {
@@ -511,7 +536,7 @@ function GovernmentSourceModal({
 
   const copySearchPhrase = async () => {
     try {
-      await navigator.clipboard.writeText("農業部 農業天然災害救助 公告區域");
+      await navigator.clipboard.writeText(scenario.sourceQuery);
       toast({
         title: "查詢文字已複製",
         status: "success",
@@ -521,7 +546,7 @@ function GovernmentSourceModal({
     } catch {
       toast({
         title: "瀏覽器無法自動複製",
-        description: "請搜尋「農業部 農業天然災害救助 公告區域」。",
+        description: `請搜尋「${scenario.sourceQuery}」。`,
         status: "info",
         duration: 3800,
         position: "top",
@@ -530,9 +555,9 @@ function GovernmentSourceModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} isCentered size="sm" motionPreset="scale">
+    <Modal isOpen={isOpen} onClose={onClose} isCentered size="sm" motionPreset="scale" scrollBehavior="inside">
       <ModalOverlay bg="rgba(9,36,60,.42)" backdropFilter="blur(3px)" />
-      <ModalContent mx="16px" borderRadius="20px">
+      <ModalContent mx="16px" maxH="calc(100dvh - 32px)" borderRadius="20px">
         <ModalHeader pb="7px" color="navy.900" fontSize="19px">
           政府來源
         </ModalHeader>
@@ -551,13 +576,13 @@ function GovernmentSourceModal({
             </Circle>
             <Box>
               <Text fontSize="11px" color="brand.700" fontWeight={800}>
-                政策主管機關
+                資源主管機關
               </Text>
               <Text mt="1px" color="navy.900" fontSize="16px" fontWeight={800}>
-                農業部
+                {scenario.agency}
               </Text>
               <Text mt="3px" color="#657D8A" fontSize="12px" lineHeight="1.55">
-                農業天然災害現金救助相關公告
+                {scenario.sourceDescription}
               </Text>
             </Box>
           </HStack>
@@ -566,13 +591,13 @@ function GovernmentSourceModal({
             <HStack align="flex-start" spacing="9px">
               <Icon as={MessageCircleQuestion} mt="2px" boxSize="15px" color="warning" />
               <Text fontSize="12.5px" color="navy.700" lineHeight="1.6">
-                是否能申請，要以農業部最新公告的地區、作物項目與受理期間為準。
+                {scenario.sourceNote}
               </Text>
             </HStack>
             <HStack align="flex-start" spacing="9px">
               <Icon as={ShieldCheck} mt="2px" boxSize="15px" color="brand.600" />
               <Text fontSize="12.5px" color="navy.700" lineHeight="1.6">
-                為避免示範頁連到過期公告，本頁不直接開啟外部網址，也不會送出任何個人資料。
+                可複製下方文字查找政府資訊；服務內容與受理方式請向承辦窗口確認。
               </Text>
             </HStack>
           </Stack>
@@ -582,7 +607,7 @@ function GovernmentSourceModal({
               建議查詢文字
             </Text>
             <Text mt="4px" fontSize="13px" color="navy.800" fontWeight={700} lineHeight="1.5">
-              農業部 農業天然災害救助 公告區域
+              {scenario.sourceQuery}
             </Text>
           </Box>
         </ModalBody>
@@ -600,6 +625,14 @@ function GovernmentSourceModal({
 }
 
 export default function ResourceChatPage() {
+  const [searchParams] = useSearchParams();
+  const question = searchParams.get("q")?.trim() || null;
+  const scenario = getResourceScenario(searchParams.get("category"), question);
+
+  return <ResourceChatDemo key={`${scenario.key}:${question ?? ""}`} scenario={scenario} question={question} />;
+}
+
+function ResourceChatDemo({ scenario, question }: { scenario: ResourceScenario; question: string | null }) {
   const checklist = useDisclosure();
   const source = useDisclosure();
   const toast = useToast();
@@ -611,6 +644,12 @@ export default function ResourceChatPage() {
   const [messages, setMessages] = useState<LocalMessage[]>([]);
   const [isReplying, setIsReplying] = useState(false);
   const [memoryChoice, setMemoryChoice] = useState<MemoryChoice>(null);
+
+  useEffect(() => {
+    const previousTitle = document.title;
+    document.title = `學伴｜${scenario.label}資源諮詢`;
+    return () => { document.title = previousTitle; };
+  }, [scenario.label]);
 
   useEffect(() => {
     return () => {
@@ -653,24 +692,20 @@ export default function ResourceChatPage() {
     if (fileInputRef.current) fileInputRef.current.value = "";
   };
 
-  const submitMessage = (event: FormEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    const trimmed = draft.trim();
-    if ((!trimmed && !attachmentName) || isReplying) return;
+  const sendMessage = (questionText: string, imageName: string | null = null) => {
+    if ((!questionText && !imageName) || isReplying) return;
 
     const now = new Intl.DateTimeFormat("zh-TW", {
       hour: "2-digit",
       minute: "2-digit",
       hour12: false,
     }).format(new Date());
-    const text = [trimmed, attachmentName ? `已附上照片：${attachmentName}` : ""].filter(Boolean).join("\n");
+    const text = [questionText, imageName ? `已附上照片：${imageName}` : ""].filter(Boolean).join("\n");
 
     setMessages((current) => [
       ...current,
       { id: Date.now(), role: "student", text, time: now },
     ]);
-    setDraft("");
-    removeAttachment();
     setIsReplying(true);
 
     replyTimerRef.current = window.setTimeout(() => {
@@ -679,12 +714,20 @@ export default function ResourceChatPage() {
         {
           id: Date.now() + 1,
           role: "assistant",
-          text: "收到！我會把你補充的內容一起列入比對。這是互動示範，訊息不會送到後端；實際資格仍要由所在地公所確認。",
+          text: getScenarioReply(scenario, questionText),
           time: now,
         },
       ]);
       setIsReplying(false);
     }, 650);
+  };
+
+  const submitMessage = (event: FormEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    if ((!draft.trim() && !attachmentName) || isReplying) return;
+    sendMessage(draft.trim(), attachmentName);
+    setDraft("");
+    removeAttachment();
   };
 
   const handleComposerKeyDown = (event: KeyboardEvent<HTMLTextAreaElement>) => {
@@ -740,7 +783,7 @@ export default function ResourceChatPage() {
         accept="image/*"
         display="none"
         onChange={selectAttachment}
-        aria-label="選擇災損照片"
+        aria-label="選擇附件照片"
       />
       <HStack
         spacing="5px"
@@ -803,6 +846,47 @@ export default function ResourceChatPage() {
     <>
       <StudentShell backHref="/resources.html" showBottomNav={false} footer={composer}>
         <VStack align="stretch" spacing="13px" px={{ base: "14px", sm: "17px" }} pt="18px" pb="24px">
+          <Box>
+            <HStack justify="space-between" spacing="8px">
+              <HStack spacing="8px">
+                <Circle size="30px" bg={scenario.background} color={scenario.color}>
+                  <Icon as={scenarioIcons[scenario.key]} boxSize="18px" />
+                </Circle>
+                <Text color="navy.800" fontSize="16px" fontWeight={800}>{scenario.label}資源諮詢</Text>
+              </HStack>
+              <Badge px="8px" py="4px" borderRadius="full" bg="white" color="#6C808D" fontSize="10px">
+                示範情境
+              </Badge>
+            </HStack>
+            <Text mt="7px" color="#6C808D" fontSize="11.5px" lineHeight="1.65">
+              先看看情境中的協助方向，再點選問題繼續了解。
+            </Text>
+            <Flex as="nav" aria-label="切換資源分類" mt="11px" gap="6px" wrap="wrap">
+              {resourceCategories.map((category) => {
+                const selected = category.key === scenario.key;
+                return (
+                  <Button
+                    key={category.key}
+                    as={RouterLink}
+                    to={`/resource-chat.html?category=${category.key}`}
+                    aria-label={`切換到${category.label}分類`}
+                    aria-current={selected ? "page" : undefined}
+                    size="xs"
+                    h="30px"
+                    px="10px"
+                    borderRadius="full"
+                    border="1px solid"
+                    borderColor={selected ? scenario.color : "#DDE8EC"}
+                    bg={selected ? scenario.background : "white"}
+                    color={selected ? scenario.color : "#6C808D"}
+                    _hover={{ bg: selected ? scenario.background : "#EDF5F7" }}
+                  >
+                    {category.label}
+                  </Button>
+                );
+              })}
+            </Flex>
+          </Box>
           <Flex justify="flex-end">
             <Box maxW="84%">
               <Box
@@ -813,8 +897,8 @@ export default function ResourceChatPage() {
                 borderRadius="17px 17px 4px 17px"
                 boxShadow="0 6px 16px rgba(18,183,167,.09)"
               >
-                <Text fontSize="13.5px" fontWeight={700} lineHeight="1.65">
-                  阿公的菜園被颱風吹壞了，有沒有補助可以申請？
+                <Text fontSize="13.5px" fontWeight={700} lineHeight="1.65" overflowWrap="anywhere">
+                  {question ?? scenario.question}
                 </Text>
               </Box>
               <HStack mt="4px" justify="flex-end" spacing="4px" pr="2px" color="#82949E">
@@ -824,39 +908,80 @@ export default function ResourceChatPage() {
             </Box>
           </Flex>
 
+          {question && question !== scenario.question && (
+            <Text fontSize="11.5px" color="#6C808D" lineHeight="1.65">
+              以下以「{scenario.question}」示範這個分類的資源整理。
+            </Text>
+          )}
+
           <ResourceRecommendationCard
+            scenario={scenario}
             onOpenChecklist={checklist.onOpen}
             onOpenSource={source.onOpen}
           />
 
-          <MemorySuggestion choice={memoryChoice} onChoose={chooseMemory} />
+          <Box as="section" aria-label="建議追問" p="14px" bg={scenario.background} borderRadius="16px">
+            <HStack mb="9px" spacing="6px" color="navy.700">
+              <Icon as={MessageCircleQuestion} boxSize="16px" color={scenario.color} />
+              <Text fontSize="12px" fontWeight={800}>接著你可以問</Text>
+            </HStack>
+            <Stack spacing="7px">
+              {scenario.followUps.map((followUp) => (
+                <Button
+                  key={followUp.question}
+                  variant="outline"
+                  size="sm"
+                  h="auto"
+                  minH="36px"
+                  py="8px"
+                  px="11px"
+                  bg="white"
+                  borderColor="#DDE8EC"
+                  color="navy.700"
+                  fontSize="12px"
+                  whiteSpace="normal"
+                  textAlign="left"
+                  justifyContent="space-between"
+                  rightIcon={<ChevronRight size={15} />}
+                  isDisabled={isReplying}
+                  onClick={() => sendMessage(followUp.question)}
+                >
+                  {followUp.question}
+                </Button>
+              ))}
+            </Stack>
+          </Box>
 
-          {messages.map((message) =>
-            message.role === "student" ? (
-              <Flex key={message.id} justify="flex-end">
-                <Box maxW="84%">
-                  <Box px="14px" py="10px" bg="#D2F5EF" borderRadius="17px 17px 4px 17px">
-                    <Text whiteSpace="pre-line" fontSize="13px" color="#08766D" fontWeight={600} lineHeight="1.6">
+          <MemorySuggestion label={scenario.memoryLabel} choice={memoryChoice} onChoose={chooseMemory} />
+
+          <VStack role="log" aria-label="後續問答" align="stretch" spacing="13px">
+            {messages.map((message) =>
+              message.role === "student" ? (
+                <Flex key={message.id} justify="flex-end">
+                  <Box maxW="84%">
+                    <Box px="14px" py="10px" bg="#D2F5EF" borderRadius="17px 17px 4px 17px">
+                      <Text whiteSpace="pre-line" overflowWrap="anywhere" fontSize="13px" color="#08766D" fontWeight={600} lineHeight="1.6">
+                        {message.text}
+                      </Text>
+                    </Box>
+                    <HStack mt="4px" justify="flex-end" spacing="4px" color="#82949E">
+                      <Text fontSize="10.5px">{message.time}</Text>
+                      <Icon as={CheckCheck} boxSize="13px" color="brand.500" />
+                    </HStack>
+                  </Box>
+                </Flex>
+              ) : (
+                <HStack key={message.id} align="flex-start" spacing="9px">
+                  <BotMark size="30px" />
+                  <Box px="13px" py="10px" bg="white" border="1px solid" borderColor="#E1EBEE" borderRadius="4px 16px 16px 16px">
+                    <Text whiteSpace="pre-line" fontSize="12.5px" color="navy.700" lineHeight="1.65">
                       {message.text}
                     </Text>
                   </Box>
-                  <HStack mt="4px" justify="flex-end" spacing="4px" color="#82949E">
-                    <Text fontSize="10.5px">{message.time}</Text>
-                    <Icon as={CheckCheck} boxSize="13px" color="brand.500" />
-                  </HStack>
-                </Box>
-              </Flex>
-            ) : (
-              <HStack key={message.id} align="flex-start" spacing="9px">
-                <BotMark size="30px" />
-                <Box px="13px" py="10px" bg="white" border="1px solid" borderColor="#E1EBEE" borderRadius="4px 16px 16px 16px">
-                  <Text fontSize="12.5px" color="navy.700" lineHeight="1.65">
-                    {message.text}
-                  </Text>
-                </Box>
-              </HStack>
-            ),
-          )}
+                </HStack>
+              ),
+            )}
+          </VStack>
 
           {isReplying && (
             <HStack align="center" spacing="9px" aria-live="polite">
@@ -871,8 +996,8 @@ export default function ResourceChatPage() {
         </VStack>
       </StudentShell>
 
-      <ChecklistModal isOpen={checklist.isOpen} onClose={checklist.onClose} />
-      <GovernmentSourceModal isOpen={source.isOpen} onClose={source.onClose} />
+      <ChecklistModal scenario={scenario} isOpen={checklist.isOpen} onClose={checklist.onClose} />
+      <GovernmentSourceModal scenario={scenario} isOpen={source.isOpen} onClose={source.onClose} />
     </>
   );
 }
