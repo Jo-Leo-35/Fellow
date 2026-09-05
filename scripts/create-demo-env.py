@@ -9,14 +9,22 @@ import secrets
 from pathlib import Path
 
 
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--output", type=Path, default=Path(".env"))
+    parser.add_argument(
+        "--output",
+        type=Path,
+        default=PROJECT_ROOT / ".env",
+        help="output path (default: <project-root>/.env)",
+    )
     parser.add_argument("--port", type=int, default=8080)
     args = parser.parse_args()
     if not 1 <= args.port <= 65535:
         parser.error("--port must be between 1 and 65535")
-    template = Path(__file__).resolve().parents[1] / ".env.example"
+    template = PROJECT_ROOT / ".env.example"
     codes = {
         role: secrets.token_urlsafe(32)
         for role in ("student_demo", "teacher_demo", "government_demo")
