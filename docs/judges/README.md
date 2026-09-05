@@ -1,15 +1,12 @@
 # 評審請看這
 
-這個資料夾是 Fellow／學伴的評審體驗入口。
+這個資料夾是 Fellow／學伴的評審 Demo 專用入口。
 
-## 建議開啟方式
+## Demo 專用入口
 
-在專案根目錄執行 python3 scripts/local-demo.py start 後，開啟：
-
-- http://localhost:45465/%E8%A9%95%E5%AF%A9%E8%AB%8B%E7%9C%8B%E9%80%99/
-- Final Demo：http://localhost:45465/%E8%A9%95%E5%AF%A9%E8%AB%8B%E7%9C%8B%E9%80%99/final-demo.html
-
-直接使用 Vite 開發伺服器時，也可在相同 port 開啟「/評審請看這/」。
+- [評審導覽](index.html)
+- [兩分鐘投影片](Fellow-兩分鐘-Demo-投影片.html)
+- [Final Demo](final-demo.html)
 
 ## 兩分鐘影片投影片
 
@@ -32,4 +29,4 @@
 
 ## 目前系統口徑
 
-Agent 為明確標示的 Fake Demo／offline_demo，不呼叫外部 AI provider；其餘前後端 API、SQLite／Chroma、權限、持久化與三角色資料流程已實際串接。政策與教材是原創示範資料；資源推薦不是正式資格核定；政府端只讀匿名 Insight 聚合，不讀取原始學生對話。
+評審 Demo 採專用示範模型與原創內容；前後端 API、權限、持久化與三角色資料流程皆已實際串接。政策與教材是原創示範資料；資源推薦不是正式資格核定；政府端只讀匿名 Insight 聚合，不讀取原始學生對話。

@@ -1,4 +1,4 @@
-# Fellow 學伴
+# Fellow 學伴 [Hackathon]
 
 [繁體中文](README.md) | **English**
 
@@ -15,15 +15,15 @@ For judges: [Judge reference guide (Traditional Chinese)](評審參考文件.md)
 
 ## Problem and Goals
 
-Students in rural communities may not have immediate access to individual explanations when they struggle with schoolwork. Their families may also find it difficult to navigate scattered public assistance information and eligibility requirements. Teachers and public agencies need to understand where support is most needed while protecting student privacy.
+Students in rural communities may not have immediate access to individual explanations when they struggle with schoolwork. Their families may also find it difficult to navigate scattered public assistance information and eligibility requirements, and those family-level challenges often become concerns for the students themselves. Teachers and public agencies need to understand where support is most needed while protecting student privacy.
 
-Fellow brings learning Q&A, interactive teaching animations, and family resource discovery into one student-facing experience. It turns abstract concepts and complex information into understandable explanations and practical next steps. Teachers receive learning summaries within their authorized scope, while government users see aggregated, anonymous demand statistics. The goal is to make support easier to access and inform teaching and resource allocation. These intended benefits have not yet been evaluated in real-world deployments.
+Fellow brings learning Q&A, interactive teaching animations, and family resource discovery into one student-facing experience. It turns abstract concepts and complex information into understandable explanations and practical next steps. Teachers receive learning summaries within their authorized scope, while government users see aggregated, anonymous demand statistics. The goal is to make support easier to access and inform teaching and resource allocation.
 
-The current release runs in `offline_demo` mode. Backend APIs, role permissions, and persistent storage are connected; responses use original, predefined content and local retrieval rather than external AI model calls. Students can enter without an access code, with no daily question limit.
+The current release runs in `offline_demo` mode. Frontend and backend APIs, role permissions, and persistent storage are connected. Responses use original, predefined AI-generated data and local retrieval without calling external AI models, reducing security exposure; feasibility has also been tested with local models. Students verified by government agencies as low-income or living in rural communities can enter without an access code and have no daily question limit.
 
 ## Core Features
 
-- **Learning Q&A and interactive animations**: Six topics—Newtonian mechanics, thermodynamics, entropy, chemical equilibrium, chemical bonding, and reaction rates—with everyday analogies, worked explanations, material citations, practice questions, and interactive animations.
+- **Learning Q&A and interactive animations**: Six topics—Newtonian mechanics, thermodynamics, entropy, chemical equilibrium, chemical bonding, and reaction rates—with everyday analogies, worked explanations, material citations, practice questions, and interactive animations. Future partnerships with publishers could add more curriculum-aligned learning materials.
 - **Personalized public resource discovery**: Six categories—disasters, agriculture, education, financial support, health, and other needs—with demonstration resources, conditions to verify, document checklists, and next steps. Saving information as memory requires student consent, and memories can be deleted.
 - **Notifications and conversation history**: View demonstration notifications, open their details, and mark them as read. Conversations, citations, uploaded images, and profiles persist across page reloads.
 - **Teacher learning insights**: Filter authorized rosters and learning summaries by class, subject, and period; browse materials, plan review activities, and export CSV files.
@@ -47,8 +47,8 @@ flowchart TD
     RAG --> Chroma[(Chroma vector index)]
     Catalog[Original learning and policy demo JSON] --> Chroma
     Catalog --> DB
-    Agent --> Offline[Current: predefined offline responses]
-    Agent -. Live configuration and validation pending .-> Provider[OpenAI-compatible API: generation and embeddings]
+    Agent --> Offline
+    Agent -.-> Provider[OpenAI-compatible API: generation and embeddings]
     Provider -. Live vector retrieval .-> Chroma
 ```
 
@@ -77,7 +77,7 @@ Version references: [frontend packages](package.json), [frontend lockfile](packa
 
 ## Installation and Execution
 
-The local launcher currently targets Linux / WSL and uses `/proc` to manage service processes. Prerequisites are Git, Node.js 22, npm, Python 3.12, and working `pip` and `venv` modules. Installing dependencies for the first time requires internet access. The offline Demo does not require an external AI key.
+The local launcher currently targets Linux / WSL and uses `/proc` to manage service processes. Prerequisites are Git, Node.js 22, npm, Python 3.12, and working `pip` and `venv` modules. Installing dependencies for the first time requires internet access. The offline Demo does not require an external AI key, and an Agent can be added in the future.
 
 ```bash
 # Clone the project for the first time
@@ -103,7 +103,7 @@ curl --fail http://localhost:45465/health
 
 If you are using the existing development workspace, first run `cd ~/workspace/FutureAI`, then continue with configuration and startup.
 
-After startup, open these local endpoints. They are for reproducing the project locally, not public demo URLs for the submission form.
+After startup, open these local endpoints. They are for reproducing the project locally, not public demo URLs for the submission form; an ngrok proxy will be used later.
 
 | Entry | Local URL |
 | --- | --- |
@@ -133,9 +133,6 @@ Python packages live in `.venv/`; runtime data and logs live in `runtime/local-d
 
 ## Project Demo
 
-- Public demo URL (optional): No public deployment URL has been provided yet.
-- Evaluation video: **Pending: add a publicly watchable YouTube URL and confirm the total length is no more than two minutes before submission.**
-- Source repository: [Jo-Leo-35/Fellow](https://github.com/Jo-Leo-35/Fellow). Public accessibility and whether the latest changes have been pushed must be checked before submission.
 - Judge's guide: [Start here](docs/judges/README.md), with HTML walkthroughs and PDFs in Traditional Chinese. PDFs can be viewed directly in the repository.
 
 | Feature guide | Document |
@@ -190,11 +187,11 @@ Submit fictional Demo data only. Do not commit `.env`, API keys, tokens, runtime
 
 ## Team Members
 
-Team number and name: **Pending; use the original registration details.**
-
 | Name | Responsibilities |
 | --- | --- |
-| Member name pending | Actual responsibilities pending |
+| Hachiware | Frontend development, backend development, and system architecture design |
+| Robyn | Product ideation, backend development, and data analysis |
+| Momonga | Product ideation, frontend visual design, and UI/UX |
 
 ## License
 
