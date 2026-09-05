@@ -81,17 +81,15 @@ await run("alert tabs, details, and read", "/alerts.html", { width: 390, height:
 });
 
 await run("teacher period and detail", "/teacher.html", { width: 1440, height: 900 }, async (page) => {
-  await page.getByRole("button", { name: /選擇統計期間/ }).click();
-  await page.getByRole("menuitem", { name: "過去 30 天" }).click();
-  await page.getByText("486", { exact: true }).waitFor();
-  await page.getByRole("button", { name: "查看全部" }).click();
-  await page.getByRole("dialog").waitFor();
+  await page.getByLabel("選擇統計期間", { exact: true }).selectOption("30d");
+  await page.getByRole("navigation", { name: "教師版導覽" }).getByRole("button", { name: "學生管理", exact: true }).click();
+  await page.getByRole("textbox", { name: "搜尋學生" }).fill("陳予安");
+  await page.getByText("陳予安", { exact: true }).waitFor();
 });
 
 await run("government period and insight", "/government.html", { width: 1440, height: 900 }, async (page) => {
-  await page.getByRole("button", { name: /選擇統計期間/ }).click();
-  await page.getByRole("menuitem", { name: "過去 30 天" }).click();
-  await page.getByText("4,968", { exact: true }).waitFor();
+  await page.getByLabel("統計期間", { exact: true }).selectOption("30d");
+  await page.getByTestId("government-kpi-資源需求").waitFor();
   await page.getByRole("button", { name: "查看趨勢" }).click();
   await page.getByRole("dialog").waitFor();
 });

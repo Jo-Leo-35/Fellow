@@ -1,0 +1,47 @@
+[
+  {
+    "id": "demo-alert-agriculture",
+    "kind": "critical",
+    "title": "重要提醒（Demo）",
+    "message": "有一則農業天然災害救助資訊可供查詢，請向所在地公所確認當次公告。",
+    "reason": "因為你已同意保存「家裡從事農業」這項資料。",
+    "category": "agriculture",
+    "region": "美濃",
+    "target_feature": "farmer",
+    "policy_id": "demo-agriculture-disaster-aid",
+    "source_note": "離線 Demo 通知；不代表目前有仍有效的救助公告。",
+    "action": {"kind": "resource", "target_id": "demo-agriculture-disaster-aid", "label": "查看資源方向"},
+    "days_ago": 1,
+    "expires_at": null
+  },
+  {
+    "id": "demo-alert-education",
+    "kind": "information",
+    "title": "就學資源提醒（Demo）",
+    "message": "如有本學期助學需求，請向學校確認現行方案與校內辦理時程。",
+    "reason": "因為你目前設定為學生，且關注就學資源。",
+    "category": "education",
+    "region": null,
+    "target_feature": "student",
+    "policy_id": "demo-education-aid-and-loan",
+    "source_note": "離線 Demo 通知；沒有假設截止日或方案仍有效。",
+    "action": {"kind": "resource", "target_id": "demo-education-aid-and-loan", "label": "查看資源方向"},
+    "days_ago": 3,
+    "expires_at": null
+  },
+  {
+    "id": "demo-alert-learning",
+    "kind": "learning",
+    "title": "你的問題有複習內容（Demo）",
+    "message": "關於「牛頓力學的解釋」已準備好教材與練習題。",
+    "reason": "因為你最近詢問過力與加速度的關係。",
+    "category": null,
+    "region": null,
+    "target_feature": "student",
+    "policy_id": null,
+    "source_note": "離線 Demo 學習提醒。",
+    "action": {"kind": "learning_topic", "target_id": "newton", "label": "去複習"},
+    "days_ago": 4,
+    "expires_at": null
+  }
+]

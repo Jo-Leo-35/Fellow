@@ -646,7 +646,7 @@ export default function StudentHomePage() {
               <QuickActionCard
                 href="/learning-chat.html"
                 label="問功課"
-                description="數學、國文、英文…"
+                description="教學動畫，陪你學物理化學"
                 icon={BookOpen}
                 tone="learning"
               />

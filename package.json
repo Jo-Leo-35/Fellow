@@ -10,7 +10,9 @@
     "typecheck": "tsc -b --pretty false",
     "test:visual": "node scripts/visual-audit.mjs",
     "test:interactions": "node scripts/interaction-audit.mjs",
-    "test:categories": "node scripts/resource-category-audit.mjs"
+    "test:categories": "node scripts/resource-category-audit.mjs",
+    "test:learning": "node scripts/learning-audit.mjs",
+    "test:dashboards": "node scripts/dashboard-audit.mjs"
   },
   "dependencies": {
     "@chakra-ui/react": "2.10.9",

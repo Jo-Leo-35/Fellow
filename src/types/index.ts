@@ -1,11 +1,6 @@
 export type StudentNavKey = "chat" | "resources" | "alerts" | "profile";
 
-export type ResponseType =
-  | "text"
-  | "learning_answer"
-  | "resource_recommendation"
-  | "memory_suggestion"
-  | "alert";
+export type { ResponseTypeWire as ResponseType } from "./wire";
 
 export interface LearningAnswer {
   title: string;
@@ -33,3 +28,6 @@ export interface MemorySuggestion {
   displayValue: string;
   reason?: string;
 }
+
+export * from "./wire";
+export * from "./view";

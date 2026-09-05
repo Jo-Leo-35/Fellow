@@ -1,8 +1,15 @@
 export const chatHistory = [
-  { group: "今天", items: [{ title: "3/4 ÷ 1/2 怎麼算？", time: "10:24" }] },
+  {
+    group: "今天",
+    items: [
+      { title: "牛頓力學的解釋", time: "10:24" },
+      { title: "熱力學的解釋", time: "09:40" },
+    ],
+  },
   {
     group: "本週",
     items: [
+      { title: "化學平衡為什麼還在反應？", time: "11/19" },
       { title: "農作物受損有什麼補助？", time: "11/18" },
       { title: "家裡有災害應該怎麼辦？", time: "11/17" },
       { title: "申請助學金需要什麼文件？", time: "11/16" },
@@ -54,8 +61,8 @@ export const alertItems = [
     kind: "learning",
     title: "你的問題有新回覆",
     date: "11/17",
-    message: "關於「3/4 ÷ 1/2 怎麼算？」已經準備好練習題",
-    reason: "因為你最近詢問過分數除法。",
+    message: "關於「牛頓力學的解釋」已經準備好練習題",
+    reason: "因為你最近詢問過力與加速度的關係。",
   },
 ];
 
