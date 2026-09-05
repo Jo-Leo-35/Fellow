@@ -1,0 +1,1092 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Fellow 學伴兩分鐘 Hackathon Demo 投影片">
+  <title>Fellow｜兩分鐘 Demo 投影片</title>
+  <link rel="stylesheet" href="assets/fonts/400.css">
+  <link rel="stylesheet" href="assets/fonts/700.css">
+  <style>
+    :root {
+      color-scheme: dark;
+      --ink: #0a2941;
+      --blue: #287fe7;
+      --blue-2: #66b8ff;
+      --cream: #f7f3ea;
+      --orange: #f7a54a;
+      --red: #ee6657;
+      --teal: #15b7a6;
+      --white: #fff;
+      --muted: #b8c9d8;
+      --stage-w: min(100vw, calc(100vh * 16 / 9));
+      font-family: "Noto Sans TC", system-ui, sans-serif;
+    }
+
+    * { box-sizing: border-box; }
+    html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; background: #061725; }
+    body { color: var(--white); user-select: none; }
+    button, a { font: inherit; }
+    button { color: inherit; }
+
+    .viewport {
+      width: 100vw;
+      height: 100vh;
+      display: grid;
+      place-items: center;
+      background:
+        radial-gradient(circle at 50% 120%, rgba(58, 150, 228, .23), transparent 43%),
+        #061725;
+    }
+
+    .deck {
+      position: relative;
+      width: var(--stage-w);
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      container-type: size;
+      background: var(--ink);
+      box-shadow: 0 3cqw 8cqw rgba(0, 0, 0, .48);
+      isolation: isolate;
+    }
+
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: grid;
+      padding: 4.2cqw 5.6cqw 4.6cqw;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(2.5cqw) scale(.985);
+      transition: opacity .55s ease, transform .65s cubic-bezier(.2,.8,.2,1), visibility 0s .65s;
+      overflow: hidden;
+    }
+
+    .slide.active {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0) scale(1);
+      transition-delay: 0s;
+      z-index: 2;
+    }
+
+    .slide::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      background-image:
+        linear-gradient(rgba(255,255,255,.028) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.028) 1px, transparent 1px);
+      background-size: 3.8cqw 3.8cqw;
+      mask-image: linear-gradient(to bottom, #000, transparent 88%);
+      z-index: -2;
+    }
+
+    .slide::after {
+      content: "";
+      position: absolute;
+      width: 46cqw;
+      height: 46cqw;
+      border-radius: 50%;
+      right: -22cqw;
+      top: -24cqw;
+      background: radial-gradient(circle, var(--glow, rgba(58,145,236,.32)), transparent 68%);
+      z-index: -1;
+    }
+
+    .slide-brand {
+      position: absolute;
+      top: 2cqw;
+      left: 2.4cqw;
+      display: flex;
+      align-items: center;
+      gap: .65cqw;
+      color: rgba(255,255,255,.8);
+      font-size: .8cqw;
+      letter-spacing: .08em;
+      z-index: 5;
+    }
+
+    .slide-brand img { width: 1.55cqw; height: 1.55cqw; }
+    .slide-brand b { color: #fff; font-size: .95cqw; }
+    .slide-brand i { width: 1px; height: .95cqw; background: rgba(255,255,255,.25); }
+
+    .slide-number {
+      position: absolute;
+      right: 2.5cqw;
+      bottom: 1.75cqw;
+      display: flex;
+      align-items: center;
+      gap: .65cqw;
+      color: rgba(255,255,255,.58);
+      font-size: .78cqw;
+      letter-spacing: .12em;
+      z-index: 5;
+    }
+
+    .slide-number b { color: #fff; font-size: 1.05cqw; }
+    .slide-number::before { content: ""; width: 2.8cqw; height: 1px; background: rgba(255,255,255,.25); }
+
+    .eyebrow {
+      display: inline-flex;
+      align-items: center;
+      gap: .65cqw;
+      color: var(--accent, var(--blue-2));
+      font-size: .82cqw;
+      font-weight: 700;
+      letter-spacing: .15em;
+      text-transform: uppercase;
+    }
+
+    .eyebrow::before { content: ""; width: 1.8cqw; height: .22cqw; border-radius: 1cqw; background: currentColor; }
+    h1, h2, h3, p { margin: 0; }
+    h1 { font-size: 4.65cqw; line-height: 1.08; letter-spacing: -.055em; }
+    h2 { font-size: 3.1cqw; line-height: 1.12; letter-spacing: -.045em; }
+    h3 { font-size: 1.25cqw; line-height: 1.3; }
+    p { font-size: 1.1cqw; line-height: 1.65; color: #d2dfeb; }
+
+    .accent { color: var(--accent, var(--blue-2)); }
+    .pill {
+      display: inline-flex;
+      align-items: center;
+      gap: .42cqw;
+      padding: .45cqw .78cqw;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 99px;
+      background: rgba(255,255,255,.07);
+      color: #dceafa;
+      font-size: .72cqw;
+      backdrop-filter: blur(12px);
+    }
+
+    .reveal { opacity: 0; transform: translateY(1.2cqw); }
+    .active .reveal { animation: reveal .72s cubic-bezier(.2,.75,.2,1) forwards; animation-delay: var(--delay, .15s); }
+    @keyframes reveal { to { opacity: 1; transform: translateY(0); } }
+
+    /* 01 — Hook */
+    .slide-hook {
+      --accent: #75c5ff;
+      --glow: rgba(71,159,236,.44);
+      grid-template-columns: 1.25fr .75fr;
+      align-items: center;
+      background:
+        radial-gradient(circle at 72% 52%, rgba(52,141,218,.3), transparent 33%),
+        linear-gradient(125deg, #071c2c 0%, #0c3150 72%, #0c2940 100%);
+    }
+
+    .hook-copy { position: relative; z-index: 2; padding-left: 1.1cqw; }
+    .hook-copy h1 { max-width: 59cqw; margin: 1.15cqw 0 1.3cqw; }
+    .hook-copy p { max-width: 52cqw; font-size: 1.35cqw; }
+    .hook-copy .tag-row { display: flex; gap: .55cqw; margin-top: 2.2cqw; flex-wrap: wrap; }
+
+    .hook-visual { position: relative; align-self: stretch; }
+    .hook-visual .halo {
+      position: absolute;
+      width: 30cqw;
+      height: 30cqw;
+      left: -2cqw;
+      top: 8.6cqw;
+      border-radius: 50%;
+      border: 1px solid rgba(111,199,255,.32);
+      box-shadow: 0 0 0 3cqw rgba(75,164,231,.05), 0 0 0 7cqw rgba(75,164,231,.025);
+    }
+
+    .hook-visual .mascot {
+      position: absolute;
+      width: 31cqw;
+      left: -1.7cqw;
+      bottom: -3.4cqw;
+      filter: drop-shadow(0 2cqw 2.4cqw rgba(0,0,0,.35));
+    }
+
+    .float-chip {
+      position: absolute;
+      z-index: 3;
+      padding: .72cqw 1cqw;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: .85cqw;
+      background: rgba(5,32,51,.75);
+      box-shadow: 0 1cqw 2.5cqw rgba(0,0,0,.22);
+      backdrop-filter: blur(16px);
+      font-size: .78cqw;
+      font-weight: 700;
+    }
+
+    .float-chip.one { top: 11cqw; left: -5cqw; }
+    .float-chip.two { top: 19cqw; right: -1cqw; }
+    .float-chip.three { bottom: 9cqw; left: -3cqw; }
+    .active .float-chip { animation: float 3.2s ease-in-out infinite alternate; animation-delay: var(--delay); }
+    @keyframes float { to { transform: translateY(-.7cqw); } }
+
+    /* 02 — Journey */
+    .slide-journey {
+      --accent: #75c5ff;
+      --glow: rgba(91,170,235,.35);
+      grid-template-rows: auto 1fr;
+      gap: 2cqw;
+      background: linear-gradient(140deg, #071c2c, #0a2e49 65%, #0b3d60);
+    }
+
+    .journey-heading { display: flex; align-items: end; justify-content: space-between; gap: 3cqw; }
+    .journey-heading h2 { max-width: 58cqw; margin-top: .65cqw; }
+    .journey-heading p { width: 25cqw; padding-bottom: .3cqw; }
+    .journey-line { position: relative; display: grid; grid-template-columns: repeat(5, 1fr); gap: 1cqw; align-items: center; }
+    .journey-line::before {
+      content: "";
+      position: absolute;
+      height: .16cqw;
+      left: 7cqw;
+      right: 7cqw;
+      top: 9.4cqw;
+      background: linear-gradient(90deg, var(--blue-2), var(--orange), var(--red), var(--teal), #84c8ff);
+      transform-origin: left;
+      transform: scaleX(0);
+      opacity: .7;
+    }
+    .active .journey-line::before { animation: grow-x 1.6s .35s ease forwards; }
+    @keyframes grow-x { to { transform: scaleX(1); } }
+
+    .journey-step {
+      position: relative;
+      min-height: 19cqw;
+      padding: 1.7cqw 1.25cqw 1.35cqw;
+      border: 1px solid rgba(255,255,255,.13);
+      border-radius: 1.25cqw;
+      background: linear-gradient(155deg, rgba(255,255,255,.1), rgba(255,255,255,.035));
+      backdrop-filter: blur(16px);
+      box-shadow: 0 1.4cqw 3cqw rgba(0,0,0,.16);
+      z-index: 1;
+    }
+
+    .journey-step .icon {
+      width: 3.55cqw;
+      height: 3.55cqw;
+      display: grid;
+      place-items: center;
+      margin-bottom: 2.4cqw;
+      border-radius: 1cqw;
+      background: color-mix(in srgb, var(--step) 24%, transparent);
+      border: 1px solid color-mix(in srgb, var(--step) 60%, transparent);
+      font-size: 1.05cqw;
+      font-weight: 700;
+    }
+
+    .journey-step small { color: var(--step); font-size: .68cqw; font-weight: 700; letter-spacing: .12em; }
+    .journey-step h3 { margin: .5cqw 0 .55cqw; font-size: 1.42cqw; }
+    .journey-step p { font-size: .82cqw; line-height: 1.55; }
+    .journey-step .role { position: absolute; left: 1.2cqw; bottom: 1cqw; color: rgba(255,255,255,.5); font-size: .65cqw; }
+
+    /* Product screenshot primitives */
+    .phone-frame {
+      position: relative;
+      width: 14.5cqw;
+      height: 31cqw;
+      padding: .55cqw;
+      border-radius: 2.2cqw;
+      background: linear-gradient(145deg, #ecf2f7, #98aebe 45%, #eff6fa);
+      box-shadow: 0 2.2cqw 4cqw rgba(0,0,0,.35);
+      overflow: hidden;
+      flex: none;
+    }
+
+    .phone-frame::after {
+      content: "";
+      position: absolute;
+      width: 4.5cqw;
+      height: .9cqw;
+      border-radius: 0 0 .75cqw .75cqw;
+      top: .52cqw;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #142a39;
+      z-index: 2;
+    }
+
+    .phone-frame img { width: 100%; height: 100%; object-fit: cover; object-position: top; border-radius: 1.72cqw; display: block; }
+    .phone-frame.secondary { transform: translate(8cqw, 4.5cqw) scale(.86); opacity: .92; }
+
+    .browser-frame {
+      position: relative;
+      overflow: hidden;
+      border: 1px solid rgba(255,255,255,.2);
+      border-radius: 1.2cqw;
+      background: #f6fafc;
+      box-shadow: 0 2cqw 4cqw rgba(0,0,0,.28);
+    }
+
+    .browser-frame::before {
+      content: "●  ●  ●        localhost:8080";
+      display: block;
+      height: 2.1cqw;
+      padding: .56cqw .9cqw;
+      color: #748b9b;
+      background: #e8eff3;
+      font-size: .62cqw;
+      letter-spacing: .18em;
+    }
+
+    .browser-frame img { width: 100%; height: calc(100% - 2.1cqw); display: block; object-fit: cover; object-position: top; }
+
+    .feature-copy h2 { margin: .7cqw 0 1cqw; max-width: 42cqw; }
+    .feature-copy > p { max-width: 38cqw; }
+    .feature-tag { display: inline-flex; align-items: center; gap: .45cqw; margin-top: 1.3cqw; color: #fff; font-size: .78cqw; font-weight: 700; }
+    .feature-tag::before { content: "✓"; display: grid; place-items: center; width: 1.2cqw; height: 1.2cqw; border-radius: 50%; background: var(--accent); color: #08233a; }
+
+    /* 03 — Learning */
+    .slide-learning {
+      --accent: #6ebcff;
+      --glow: rgba(51,139,230,.35);
+      grid-template-columns: .9fr 1.1fr;
+      align-items: center;
+      gap: 4cqw;
+      background: linear-gradient(130deg, #071d2e, #0b3657);
+    }
+
+    .learning-flow { display: grid; gap: .8cqw; margin-top: 1.6cqw; }
+    .learning-flow div { display: grid; grid-template-columns: 2cqw 1fr; gap: .8cqw; align-items: center; color: #d7e6f4; font-size: .9cqw; }
+    .learning-flow b { width: 2cqw; height: 2cqw; display: grid; place-items: center; border-radius: .62cqw; background: rgba(93,180,255,.16); color: var(--accent); }
+    .learning-visual { position: relative; height: 36cqw; display: flex; align-items: center; padding-left: 4cqw; }
+    .learning-visual .phone-frame:first-child { z-index: 2; }
+
+    .formula-demo {
+      position: absolute;
+      right: -.5cqw;
+      bottom: 1.5cqw;
+      width: 20cqw;
+      padding: 1.15cqw 1.3cqw;
+      border: 1px solid rgba(111,193,255,.35);
+      border-radius: 1.1cqw;
+      background: rgba(5,29,45,.9);
+      box-shadow: 0 1.5cqw 3cqw rgba(0,0,0,.3);
+      backdrop-filter: blur(18px);
+      z-index: 4;
+    }
+
+    .formula-demo small { color: #8bb7d6; font-size: .66cqw; letter-spacing: .1em; }
+    .formula-demo strong { display: block; margin: .55cqw 0 .4cqw; font-size: 1.65cqw; }
+    .formula-demo strong i { color: var(--accent); font-style: normal; }
+    .cart-track { position: relative; height: 2.3cqw; border-bottom: 1px solid rgba(255,255,255,.18); overflow: hidden; }
+    .cart-icon { position: absolute; left: 0; bottom: .48cqw; width: 2.1cqw; height: .82cqw; border-radius: .2cqw; background: var(--accent); }
+    .cart-icon::before, .cart-icon::after { content: ""; position: absolute; width: .42cqw; height: .42cqw; bottom: -.46cqw; border-radius: 50%; background: #dcefff; }
+    .cart-icon::before { left: .25cqw; }
+    .cart-icon::after { right: .25cqw; }
+    .active .cart-icon { animation: cart-run 3.4s 1.2s cubic-bezier(.15,.72,.2,1) infinite; }
+    @keyframes cart-run { 0%,12% { transform: translateX(0); } 78%,100% { transform: translateX(14cqw); } }
+
+    /* 04 — Resources */
+    .slide-resources {
+      --accent: #ffb45e;
+      --glow: rgba(246,165,74,.34);
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 4cqw;
+      background: linear-gradient(125deg, #172536, #303043 60%, #4a352a);
+    }
+
+    .resource-visual { position: relative; height: 37cqw; }
+    .resource-visual .phone-frame { position: absolute; left: 1cqw; top: 2cqw; transform: rotate(-3deg); }
+    .resource-visual .phone-frame.result { left: 15cqw; top: 4.2cqw; transform: rotate(3deg); z-index: 2; }
+    .match-card {
+      position: absolute;
+      right: -1cqw;
+      top: 1cqw;
+      width: 15cqw;
+      padding: 1cqw 1.1cqw;
+      border-radius: 1cqw;
+      background: #fff8ed;
+      color: #4c3825;
+      box-shadow: 0 1.4cqw 3cqw rgba(0,0,0,.28);
+      z-index: 4;
+    }
+
+    .match-card small { color: #a87031; font-size: .65cqw; font-weight: 700; }
+    .match-card b { display: block; margin: .35cqw 0; font-size: 1.08cqw; }
+    .match-card p { color: #72583e; font-size: .7cqw; line-height: 1.45; }
+    .path-row { display: flex; align-items: center; flex-wrap: wrap; gap: .4cqw; margin-top: 1.7cqw; }
+    .path-row span { padding: .62cqw .75cqw; border-radius: .7cqw; background: rgba(255,180,94,.13); color: #ffcc91; font-size: .76cqw; font-weight: 700; }
+    .path-row i { color: rgba(255,255,255,.38); font-style: normal; }
+
+    /* 05 — Alerts */
+    .slide-alerts {
+      --accent: #ff8478;
+      --glow: rgba(238,102,87,.4);
+      grid-template-columns: .9fr 1.1fr;
+      align-items: center;
+      gap: 4cqw;
+      background: linear-gradient(130deg, #1b1d2c, #382638 62%, #542e35);
+    }
+
+    .alerts-visual { position: relative; height: 37cqw; display: grid; place-items: center; }
+    .alerts-visual .phone-frame { transform: translateX(7cqw); }
+    .alert-pop {
+      position: absolute;
+      left: 0;
+      width: 22cqw;
+      padding: 1.15cqw 1.25cqw;
+      display: grid;
+      grid-template-columns: 2.6cqw 1fr;
+      gap: .8cqw;
+      border: 1px solid rgba(255,255,255,.18);
+      border-radius: 1cqw;
+      background: rgba(37,25,39,.92);
+      box-shadow: 0 1.5cqw 3cqw rgba(0,0,0,.3);
+      backdrop-filter: blur(16px);
+      z-index: 3;
+    }
+
+    .alert-pop.one { top: 7cqw; }
+    .alert-pop.two { bottom: 7cqw; left: 2cqw; }
+    .alert-pop .bell { width: 2.6cqw; height: 2.6cqw; display: grid; place-items: center; border-radius: .75cqw; background: rgba(255,132,120,.18); color: var(--accent); font-size: 1.05cqw; font-weight: 700; }
+    .alert-pop b { display: block; font-size: .9cqw; }
+    .alert-pop p { margin-top: .25cqw; font-size: .7cqw; line-height: 1.45; }
+    .active .alert-pop.one { animation: pulse-card 2.4s .7s ease infinite; }
+    @keyframes pulse-card { 50% { transform: translateY(-.35cqw); box-shadow: 0 1.5cqw 3cqw rgba(238,102,87,.28); } }
+
+    .reason-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6cqw; margin-top: 1.6cqw; }
+    .reason-grid div { padding: .8cqw; border-radius: .8cqw; background: rgba(255,255,255,.06); }
+    .reason-grid b { display: block; color: var(--accent); font-size: .72cqw; margin-bottom: .3cqw; }
+    .reason-grid span { color: #dce8f2; font-size: .72cqw; }
+
+    /* 06 — Teacher */
+    .slide-teacher {
+      --accent: #45d5c4;
+      --glow: rgba(21,183,166,.36);
+      grid-template-columns: .78fr 1.22fr;
+      align-items: center;
+      gap: 3.2cqw;
+      background: linear-gradient(130deg, #071f2c, #0a3a42 62%, #0b4946);
+    }
+
+    .teacher-visual { position: relative; height: 35cqw; }
+    .teacher-visual .browser-frame { position: absolute; inset: 1cqw 0 0; }
+    .teacher-visual .browser-frame img { object-position: top; }
+    .insight-card {
+      position: absolute;
+      right: -1.5cqw;
+      bottom: -1.2cqw;
+      width: 19cqw;
+      padding: 1.2cqw;
+      border: 1px solid rgba(90,224,207,.35);
+      border-radius: 1cqw;
+      background: rgba(5,41,45,.94);
+      box-shadow: 0 1.5cqw 3cqw rgba(0,0,0,.3);
+      z-index: 3;
+    }
+
+    .insight-card small { color: #91e8df; font-size: .67cqw; }
+    .insight-card b { display: block; margin: .38cqw 0 .8cqw; font-size: 1cqw; }
+    .topic-bar { display: grid; grid-template-columns: 1fr 2.4cqw; gap: .6cqw; align-items: center; margin-top: .45cqw; font-size: .67cqw; color: #cee9e6; }
+    .topic-bar i { display: block; width: 0; height: .35cqw; margin-top: .3cqw; border-radius: 99px; background: linear-gradient(90deg, var(--teal), #77e5d8); }
+    .active .topic-bar i { animation: bar-grow 1.3s var(--delay,.8s) ease forwards; }
+    @keyframes bar-grow { to { width: var(--width); } }
+    .privacy-note { margin-top: 1.5cqw; padding: .8cqw 1cqw; border-left: .22cqw solid var(--accent); background: rgba(255,255,255,.055); color: #d8ecea; font-size: .76cqw; line-height: 1.55; }
+
+    /* 07 — Government */
+    .slide-government {
+      --accent: #8bd0ff;
+      --glow: rgba(78,171,231,.4);
+      grid-template-columns: .78fr 1.22fr;
+      align-items: center;
+      gap: 3.4cqw;
+      background: linear-gradient(130deg, #061824, #0a2b42 58%, #103b57);
+    }
+
+    .government-visual { position: relative; height: 35cqw; }
+    .government-visual .browser-frame { position: absolute; inset: 1cqw 0 0; }
+    .government-visual .browser-frame img { object-position: top; }
+    .gov-metrics { position: absolute; top: 3cqw; left: -1.2cqw; display: grid; gap: .65cqw; z-index: 3; }
+    .gov-metrics div {
+      width: 12cqw;
+      padding: .8cqw 1cqw;
+      border: 1px solid rgba(255,255,255,.16);
+      border-radius: .85cqw;
+      background: rgba(6,31,47,.92);
+      box-shadow: 0 1cqw 2cqw rgba(0,0,0,.25);
+    }
+    .gov-metrics small { color: #9fc9e3; font-size: .63cqw; }
+    .gov-metrics b { display: block; margin-top: .22cqw; font-size: 1.25cqw; color: #fff; }
+
+    .shield-card {
+      position: absolute;
+      right: -1.2cqw;
+      bottom: -1.2cqw;
+      width: 20cqw;
+      padding: 1.1cqw 1.2cqw;
+      display: grid;
+      grid-template-columns: 3.2cqw 1fr;
+      gap: .9cqw;
+      align-items: center;
+      border: 1px solid rgba(129,207,255,.35);
+      border-radius: 1cqw;
+      background: rgba(5,29,45,.95);
+      box-shadow: 0 1.5cqw 3cqw rgba(0,0,0,.3);
+      z-index: 4;
+    }
+
+    .shield-card .shield-icon { width: 2.6cqw; height: 3cqw; display: grid; place-items: center; clip-path: polygon(50% 0, 92% 18%, 84% 72%, 50% 100%, 16% 72%, 8% 18%); background: linear-gradient(150deg, #9edaff, #3e9fdb); color: #08283d; font-size: 1.15cqw; font-weight: 700; }
+    .shield-card b { display: block; font-size: .92cqw; }
+    .shield-card small { color: #b7d7ec; font-size: .65cqw; }
+    .boundary-line { margin-top: 1.4cqw; display: grid; gap: .55cqw; }
+    .boundary-line div { display: flex; align-items: center; gap: .55cqw; color: #d4e6f2; font-size: .77cqw; }
+    .boundary-line b { color: var(--accent); font-size: .75cqw; }
+
+    /* 08 — Finale */
+    .slide-finale {
+      --accent: #86cdfd;
+      --glow: rgba(77,167,231,.42);
+      grid-template-rows: auto 1fr auto;
+      gap: 1.5cqw;
+      text-align: center;
+      background:
+        radial-gradient(circle at 50% 48%, rgba(53,137,202,.24), transparent 34%),
+        linear-gradient(140deg, #061725, #0a2d48 55%, #0b3b59);
+    }
+
+    .finale-heading h2 { max-width: 72cqw; margin: .55cqw auto 0; font-size: 3.55cqw; }
+    .outcome-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.2cqw; align-items: center; }
+    .outcome-card {
+      position: relative;
+      padding: 1.55cqw 1.4cqw 1.35cqw;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 1.25cqw;
+      background: linear-gradient(150deg, rgba(255,255,255,.1), rgba(255,255,255,.035));
+      text-align: left;
+      overflow: hidden;
+    }
+
+    .outcome-card::after { content: ""; position: absolute; width: 7cqw; height: 7cqw; border-radius: 50%; right: -3cqw; top: -3cqw; background: var(--card); opacity: .18; }
+    .outcome-card .outcome-icon { width: 2.45cqw; height: 2.45cqw; display: grid; place-items: center; border: 1px solid color-mix(in srgb, var(--card) 55%, transparent); border-radius: .72cqw; background: color-mix(in srgb, var(--card) 16%, transparent); color: var(--card); font-size: 1cqw; font-weight: 700; }
+    .outcome-card small { display: block; margin-top: .6cqw; color: var(--card); font-size: .68cqw; font-weight: 700; letter-spacing: .12em; }
+    .outcome-card h3 { margin: .45cqw 0 .55cqw; font-size: 1.25cqw; }
+    .outcome-card p { font-size: .78cqw; line-height: 1.5; }
+    .trust-strip { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1.2cqw; margin: 0 auto; width: 74cqw; }
+    .trust-strip::before, .trust-strip::after { content: ""; height: 1px; background: linear-gradient(90deg, transparent, rgba(255,255,255,.3)); }
+    .trust-strip::after { transform: scaleX(-1); }
+    .trust-strip strong { padding: .65cqw 1.15cqw; border-radius: 99px; background: rgba(255,255,255,.08); font-size: .8cqw; letter-spacing: .04em; }
+    .final-cta { display: flex; justify-content: center; align-items: center; gap: 1cqw; }
+    .final-cta img { width: 2.6cqw; height: 2.6cqw; }
+    .final-cta div { text-align: left; }
+    .final-cta b { display: block; font-size: 1.18cqw; }
+    .final-cta span { color: #bcd3e4; font-size: .72cqw; }
+    .final-link { color: #fff; text-decoration: none; padding: .75cqw 1.1cqw; border-radius: .8cqw; background: var(--blue); font-size: .75cqw; font-weight: 700; }
+    .demo-truth { position: absolute; left: 2.5cqw; bottom: 1.65cqw; color: rgba(255,255,255,.52); font-size: .58cqw; z-index: 5; }
+
+    /* Playback UI */
+    .timeline {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: .24cqw;
+      background: rgba(255,255,255,.1);
+      z-index: 20;
+    }
+
+    .timeline i { display: block; width: 0; height: 100%; background: linear-gradient(90deg, var(--blue-2), var(--teal)); transition: width .1s linear; }
+
+    .controls {
+      position: fixed;
+      left: 50%;
+      bottom: 1.4rem;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .45rem;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 999px;
+      background: rgba(4,20,32,.88);
+      box-shadow: 0 1rem 3rem rgba(0,0,0,.34);
+      backdrop-filter: blur(18px);
+      z-index: 100;
+      transition: opacity .25s ease, transform .25s ease;
+    }
+
+    body.controls-hidden .controls { opacity: 0; pointer-events: none; transform: translate(-50%, .75rem); }
+    .controls button, .controls a {
+      min-width: 2.4rem;
+      height: 2.4rem;
+      display: grid;
+      place-items: center;
+      padding: 0 .72rem;
+      border: 0;
+      border-radius: 999px;
+      background: transparent;
+      color: #d8e7f2;
+      text-decoration: none;
+      cursor: pointer;
+      font-size: .82rem;
+    }
+
+    .controls button:hover, .controls a:hover { background: rgba(255,255,255,.1); color: #fff; }
+    .controls [data-play] { background: var(--blue); color: #fff; font-weight: 700; }
+    .controls [data-record] { background: rgba(238,102,87,.16); color: #ff9187; font-weight: 700; }
+    .controls .timecode { min-width: 8.5rem; text-align: center; color: #c3d5e2; font-variant-numeric: tabular-nums; font-size: .78rem; }
+    .controls .divider { width: 1px; height: 1.35rem; background: rgba(255,255,255,.14); }
+
+    .presenter-notes {
+      position: fixed;
+      width: min(31rem, 92vw);
+      right: 1.25rem;
+      top: 1.25rem;
+      padding: 1.3rem;
+      border: 1px solid rgba(255,255,255,.14);
+      border-radius: 1.15rem;
+      background: rgba(4,20,32,.94);
+      box-shadow: 0 1.5rem 4rem rgba(0,0,0,.42);
+      backdrop-filter: blur(20px);
+      z-index: 110;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-.7rem);
+      transition: .25s ease;
+      user-select: text;
+    }
+
+    body.notes-open .presenter-notes { opacity: 1; visibility: visible; transform: translateY(0); }
+    .presenter-notes header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+    .presenter-notes small { color: #78c4fb; font-weight: 700; letter-spacing: .1em; }
+    .presenter-notes button { border: 0; background: transparent; color: #bcd0df; cursor: pointer; font-size: 1.1rem; }
+    .presenter-notes h2 { margin: .65rem 0 .55rem; font-size: 1.25rem; letter-spacing: 0; }
+    .presenter-notes p { color: #d7e3ec; font-size: .95rem; line-height: 1.75; }
+    .presenter-notes footer { margin-top: 1rem; color: #859dad; font-size: .75rem; }
+
+    .record-badge {
+      position: fixed;
+      left: 1.2rem;
+      top: 1.2rem;
+      display: none;
+      align-items: center;
+      gap: .5rem;
+      padding: .45rem .7rem;
+      border-radius: 99px;
+      background: rgba(4,20,32,.72);
+      color: #fff;
+      font-size: .7rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      z-index: 90;
+    }
+
+    .record-badge::before { content: ""; width: .55rem; height: .55rem; border-radius: 50%; background: #ff6156; animation: blink 1s infinite; }
+    @keyframes blink { 50% { opacity: .35; } }
+
+    .help {
+      position: fixed;
+      inset: 0;
+      display: grid;
+      place-items: center;
+      padding: 1rem;
+      background: rgba(2,13,22,.74);
+      backdrop-filter: blur(10px);
+      z-index: 120;
+      opacity: 0;
+      visibility: hidden;
+      transition: .25s ease;
+    }
+
+    body.help-open .help { opacity: 1; visibility: visible; }
+    .help-card { width: min(34rem, 94vw); padding: 1.6rem; border: 1px solid rgba(255,255,255,.16); border-radius: 1.2rem; background: #092137; box-shadow: 0 2rem 5rem rgba(0,0,0,.45); }
+    .help-card h2 { font-size: 1.6rem; letter-spacing: 0; }
+    .help-card p { margin: .55rem 0 1rem; font-size: .9rem; }
+    .shortcuts { display: grid; grid-template-columns: 1fr 1fr; gap: .55rem; }
+    .shortcuts div { display: flex; align-items: center; gap: .65rem; padding: .65rem; border-radius: .7rem; background: rgba(255,255,255,.055); color: #cfe0eb; font-size: .82rem; }
+    kbd { min-width: 2rem; padding: .25rem .4rem; border: 1px solid rgba(255,255,255,.18); border-radius: .35rem; background: rgba(255,255,255,.08); color: #fff; text-align: center; }
+    .help-card button { width: 100%; margin-top: 1rem; padding: .75rem; border: 0; border-radius: .7rem; background: var(--blue); color: #fff; cursor: pointer; font-weight: 700; }
+
+    @media (max-aspect-ratio: 4/5) {
+      .controls { bottom: .65rem; max-width: calc(100vw - 1rem); }
+      .controls [data-notes], .controls [data-help], .controls .divider { display: none; }
+      .controls .timecode { min-width: 6.8rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+
+    @page { size: 13.333in 7.5in; margin: 0; }
+    @media print {
+      html, body { width: auto; height: auto; overflow: visible; background: #fff; }
+      .viewport, .deck { display: block; width: 13.333in; height: auto; overflow: visible; box-shadow: none; }
+      .slide { position: relative; width: 13.333in; height: 7.5in; display: grid !important; opacity: 1 !important; visibility: visible !important; transform: none !important; break-after: page; page-break-after: always; }
+      .controls, .presenter-notes, .record-badge, .help, .timeline { display: none !important; }
+      .reveal { opacity: 1 !important; transform: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <main class="viewport" aria-label="Fellow 兩分鐘 Demo 投影片">
+    <div class="deck" data-deck>
+      <section class="slide slide-hook active" data-duration="10" data-title="開場｜把問題接住">
+        <div class="slide-brand"><img src="assets/logo.svg" alt=""><b>Fellow｜學伴</b><i></i><span>HACKATHON DEMO</span></div>
+        <div class="hook-copy">
+          <span class="eyebrow reveal">2:00 PRODUCT STORY</span>
+          <h1 class="reveal" style="--delay:.28s">讓一次提問，<br>走到<span class="accent">真正能採取</span>的下一步。</h1>
+          <p class="reveal" style="--delay:.48s">從偏鄉學生出發，把學習、資源與支持串成一條不掉接的路。</p>
+          <div class="tag-row reveal" style="--delay:.68s">
+            <span class="pill">學習問答</span><span class="pill">公共資源</span><span class="pill">主動通知</span><span class="pill">教師行動</span><span class="pill">匿名治理</span>
+          </div>
+        </div>
+        <div class="hook-visual">
+          <div class="halo"></div>
+          <img class="mascot reveal" style="--delay:.38s" src="assets/mascot.png" alt="Fellow 學伴機器人">
+          <span class="float-chip one" style="--delay:.1s">我終於看懂了</span>
+          <span class="float-chip two" style="--delay:.6s">下一步可以怎麼做？</span>
+          <span class="float-chip three" style="--delay:1.1s">需要被看見，也需要被保護</span>
+        </div>
+        <div class="slide-number"><b>01</b><span>08</span></div>
+      </section>
+
+      <section class="slide slide-journey" data-duration="12" data-title="願景｜一條完整支持路徑">
+        <div class="slide-brand"><img src="assets/logo.svg" alt=""><b>Fellow｜學伴</b><i></i><span>ONE CONNECTED JOURNEY</span></div>
+        <header class="journey-heading">
+          <div><span class="eyebrow reveal">從一個入口開始</span><h2 class="reveal" style="--delay:.25s">不是五個分散功能，<br>而是一條<span class="accent">完整支持路徑</span>。</h2></div>
+          <p class="reveal" style="--delay:.45s">學生先得到即時幫助，再讓最小必要訊號抵達下一個能行動的人。</p>
+        </header>
+        <div class="journey-line">
+          <article class="journey-step reveal" style="--step:#6ebcff;--delay:.35s"><div class="icon">問</div><small>01 LEARN</small><h3>先問懂</h3><p>分步回答、教材依據與互動動畫。</p><span class="role">學生</span></article>
+          <article class="journey-step reveal" style="--step:#ffb45e;--delay:.5s"><div class="icon">找</div><small>02 FIND</small><h3>找到資源</h3><p>從需求與條件，走到可能方案。</p><span class="role">學生／家庭</span></article>
+          <article class="journey-step reveal" style="--step:#ff8478;--delay:.65s"><div class="icon">醒</div><small>03 REMIND</small><h3>關鍵提醒</h3><p>交代原因、期限與立即下一步。</p><span class="role">學生</span></article>
+          <article class="journey-step reveal" style="--step:#45d5c4;--delay:.8s"><div class="icon">教</div><small>04 ACT</small><h3>教師行動</h3><p>把學習卡點變成下一堂課安排。</p><span class="role">教師</span></article>
+          <article class="journey-step reveal" style="--step:#8bd0ff;--delay:.95s"><div class="icon">策</div><small>05 SEE</small><h3>地方看見</h3><p>用匿名聚合辨識地區需求趨勢。</p><span class="role">政府</span></article>
+        </div>
+        <div class="slide-number"><b>02</b><span>08</span></div>
+      </section>
+
+      <section class="slide slide-learning" data-duration="20" data-title="功能一｜學習問答與互動動畫">
+        <div class="slide-brand"><img src="assets/logo.svg" alt=""><b>Fellow｜學伴</b><i></i><span>FEATURE 01 · STUDENT</span></div>
+        <div class="feature-copy">
+          <span class="eyebrow reveal">學習問答與互動動畫</span>
+          <h2 class="reveal" style="--delay:.25s">抽象概念，變成<br><span class="accent">看得見、能操作、可檢核</span>。</h2>
+          <p class="reveal" style="--delay:.42s">學生從六個理化主題開始，說出卡點；回答不只給結論，也讓他親手改變條件、觀察結果。</p>
+          <div class="learning-flow reveal" style="--delay:.62s">
+            <div><b>1</b><span>選擇主題，提出不懂的地方</span></div>
+            <div><b>2</b><span>閱讀分步解釋與教材依據</span></div>
+            <div><b>3</b><span>操作動畫參數，觀察概念變化</span></div>
+            <div><b>4</b><span>完成理解檢核，再繼續追問</span></div>
+          </div>
+          <span class="feature-tag reveal" style="--delay:.82s">把「聽懂了」變成可以驗證的理解</span>
+        </div>
+        <div class="learning-visual reveal" style="--delay:.32s">
+          <figure class="phone-frame"><img src="assets/learning-topics.png" alt="六個理化學習主題"></figure>
+          <figure class="phone-frame secondary"><img src="assets/learning-simulation.png" alt="牛頓力學互動動畫"></figure>
+          <div class="formula-demo">
+            <small>INTERACTIVE CONCEPT</small>
+            <strong>a = F ÷ m = <i>2.0 m/s²</i></strong>
+            <div class="cart-track"><span class="cart-icon"></span></div>
+          </div>
+        </div>
+        <div class="slide-number"><b>03</b><span>08</span></div>
+      </section>
+
+      <section class="slide slide-resources" data-duration="16" data-title="功能二｜個人化公共資源推薦">
+        <div class="slide-brand"><img src="assets/logo.svg" alt=""><b>Fellow｜學伴</b><i></i><span>FEATURE 02 · STUDENT / FAMILY</span></div>
+        <div class="feature-copy">
+          <span class="eyebrow reveal">個人化公共資源推薦</span>
+          <h2 class="reveal" style="--delay:.25s">把「我需要幫忙」<br>整理成<span class="accent">可行的下一步</span>。</h2>
+          <p class="reveal" style="--delay:.42s">學伴先釐清需求類別與關鍵條件，再排序可能資源，清楚列出準備資料、聯絡窗口與後續行動。</p>
+          <div class="path-row reveal" style="--delay:.62s"><span>需求類別</span><i>→</i><span>條件整理</span><i>→</i><span>可能方案</span><i>→</i><span>申請下一步</span></div>
+          <span class="feature-tag reveal" style="--delay:.82s">推薦是方向建議，不冒充正式資格核定</span>
+        </div>
+        <div class="resource-visual reveal" style="--delay:.32s">
+          <figure class="phone-frame"><img src="assets/resource-categories.png" alt="公共資源需求分類"></figure>
+          <figure class="phone-frame result"><img src="assets/resource-result.png" alt="個人化資源推薦結果"></figure>
+          <div class="match-card"><small>RECOMMENDED NEXT STEP</small><b>就學補助 · 可能符合</b><p>先確認申請期限，再準備身分與家庭情況證明。</p></div>
+        </div>
+        <div class="slide-number"><b>04</b><span>08</span></div>
+      </section>
+
+      <section class="slide slide-alerts" data-duration="14" data-title="功能三｜主動通知與下一步提醒">
+        <div class="slide-brand"><img src="assets/logo.svg" alt=""><b>Fellow｜學伴</b><i></i><span>FEATURE 03 · PROACTIVE</span></div>
+        <div class="feature-copy">
+          <span class="eyebrow reveal">主動通知與下一步提醒</span>
+          <h2 class="reveal" style="--delay:.25s">重要資訊，不必等到<br>學生<span class="accent">再次想起來問</span>。</h2>
+          <p class="reveal" style="--delay:.42s">提醒不只推播一個標題，而是交代匹配原因、截止時間與能立即前往的操作入口。</p>
+          <div class="reason-grid reveal" style="--delay:.62s">
+            <div><b>WHY</b><span>為什麼提醒我</span></div>
+            <div><b>WHEN</b><span>何時需要完成</span></div>
+            <div><b>NEXT</b><span>現在可以去哪裡</span></div>
+          </div>
+          <span class="feature-tag reveal" style="--delay:.82s">已讀狀態由 API 與資料庫保存</span>
+        </div>
+        <div class="alerts-visual reveal" style="--delay:.32s">
+          <figure class="phone-frame"><img src="assets/alerts.png" alt="主動通知中心"></figure>
+          <article class="alert-pop one"><span class="bell">！</span><div><b>重要提醒</b><p>所在地有新的農業天然災害救助公告。</p></div></article>
+          <article class="alert-pop two"><span class="bell">期</span><div><b>就學補助即將截止</b><p>查看窗口與應備資料，直接進入下一步。</p></div></article>
+        </div>
+        <div class="slide-number"><b>05</b><span>08</span></div>
+      </section>
+
+      <section class="slide slide-teacher" data-duration="16" data-title="功能四｜教師學習洞察與複習計畫">
+        <div class="slide-brand"><img src="assets/logo.svg" alt=""><b>Fellow｜學伴</b><i></i><span>FEATURE 04 · TEACHER</span></div>
+        <div class="feature-copy">
+          <span class="eyebrow reveal">教師學習洞察</span>
+          <h2 class="reveal" style="--delay:.25s">從大量互動，找到<br><span class="accent">下一堂課先做什麼</span>。</h2>
+          <p class="reveal" style="--delay:.42s">取得授權後，教師看到概念卡點、學生關注優先序與可執行的複習建議。</p>
+          <div class="privacy-note reveal" style="--delay:.68s"><b>資料邊界：</b>教師讀取經授權的學習摘要，不是任意翻閱學生所有原始對話。</div>
+          <span class="feature-tag reveal" style="--delay:.86s">洞察直接連到「安排重點複習」</span>
+        </div>
+        <div class="teacher-visual reveal" style="--delay:.32s">
+          <figure class="browser-frame"><img src="assets/teacher-insights.png" alt="教師學習洞察儀表板"></figure>
+          <aside class="insight-card">
+            <small>NEXT CLASS PRIORITY</small><b>建議安排：熵與熱力學第二定律</b>
+            <div class="topic-bar"><span>熵與第二定律<i style="--width:94%;--delay:.7s"></i></span><b>14</b></div>
+            <div class="topic-bar"><span>反應速率<i style="--width:86%;--delay:.9s"></i></span><b>14</b></div>
+            <div class="topic-bar"><span>化學鍵<i style="--width:43%;--delay:1.1s"></i></span><b>6</b></div>
+          </aside>
+        </div>
+        <div class="slide-number"><b>06</b><span>08</span></div>
+      </section>
+
+      <section class="slide slide-government" data-duration="17" data-title="功能五｜政府匿名需求洞察">
+        <div class="slide-brand"><img src="assets/logo.svg" alt=""><b>Fellow｜學伴</b><i></i><span>FEATURE 05 · GOVERNMENT</span></div>
+        <div class="feature-copy">
+          <span class="eyebrow reveal">政府匿名需求洞察</span>
+          <h2 class="reveal" style="--delay:.25s">讓地方需求被看見，<br>但<span class="accent">不讓個人被暴露</span>。</h2>
+          <p class="reveal" style="--delay:.42s">政府端只接收匿名聚合後的地區趨勢，用來辨識互動量、資源需求與主題變化。</p>
+          <div class="boundary-line reveal" style="--delay:.65s">
+            <div><b>可看見</b><span>地區、期間、分類、聚合數量與趨勢</span></div>
+            <div><b>不提供</b><span>姓名、帳號、個別身分與原始學生對話</span></div>
+          </div>
+          <span class="feature-tag reveal" style="--delay:.86s">Raw Conversation ≠ Government Insight</span>
+        </div>
+        <div class="government-visual reveal" style="--delay:.32s">
+          <figure class="browser-frame"><img src="assets/government-regions.png" alt="政府匿名地區需求洞察"></figure>
+          <div class="gov-metrics"><div><small>互動事件</small><b>1,190</b></div><div><small>資源需求</small><b>616</b></div></div>
+          <aside class="shield-card"><span class="shield-icon">✓</span><div><b>個人姓名：不提供</b><small>只保留能支持決策的最小必要聚合訊號</small></div></aside>
+        </div>
+        <div class="slide-number"><b>07</b><span>08</span></div>
+      </section>
+
+      <section class="slide slide-finale" data-duration="15" data-title="結尾｜從回答走向行動">
+        <div class="slide-brand"><img src="assets/logo.svg" alt=""><b>Fellow｜學伴</b><i></i><span>THE COMPLETE OUTCOME</span></div>
+        <header class="finale-heading">
+          <span class="eyebrow reveal">ONE QUESTION · THREE LEVELS OF ACTION</span>
+          <h2 class="reveal" style="--delay:.25s">不只回答一個問題，<br>而是把幫助送到<span class="accent">下一個能行動的人</span>。</h2>
+        </header>
+        <div class="outcome-grid">
+          <article class="outcome-card reveal" style="--card:#6ebcff;--delay:.45s"><span class="outcome-icon">學</span><small>STUDENT</small><h3>學生理解，也能行動</h3><p>從課業卡點走到互動驗證；從家庭需求走到可執行的資源下一步。</p></article>
+          <article class="outcome-card reveal" style="--card:#45d5c4;--delay:.62s"><span class="outcome-icon">教</span><small>TEACHER</small><h3>教師知道先幫哪裡</h3><p>把經授權的學習訊號，轉成概念優先序與下一堂課的複習安排。</p></article>
+          <article class="outcome-card reveal" style="--card:#8bd0ff;--delay:.79s"><span class="outcome-icon">策</span><small>GOVERNMENT</small><h3>地方看見匿名需求</h3><p>保護學生身分與原始對話，同時讓資源配置更貼近真實地區趨勢。</p></article>
+        </div>
+        <div class="trust-strip reveal" style="--delay:.92s"><strong>明確同意 · 最小必要資料 · 角色權限 · 匿名聚合</strong></div>
+        <footer class="final-cta reveal" style="--delay:1.05s"><img src="assets/logo.svg" alt=""><div><b>Fellow｜學伴</b><span>從一個問題，走到真正能採取的下一步。</span></div><a class="final-link" href="final-demo.html">進入 Final Demo →</a></footer>
+        <span class="demo-truth">目前 Agent 為 offline_demo；API、權限、持久化與三角色資料流程為實際串接。</span>
+        <div class="slide-number"><b>08</b><span>08</span></div>
+      </section>
+
+      <div class="timeline" aria-hidden="true"><i data-progress></i></div>
+    </div>
+  </main>
+
+  <nav class="controls" aria-label="投影片控制列">
+    <button type="button" data-prev title="上一頁（←）" aria-label="上一頁">←</button>
+    <button type="button" data-play title="播放／暫停（Space）">播放</button>
+    <span class="timecode"><b data-elapsed>00:00</b> / 02:00 · <span data-position>1 / 8</span></span>
+    <button type="button" data-next title="下一頁（→）" aria-label="下一頁">→</button>
+    <span class="divider"></span>
+    <button type="button" data-record title="從頭進入錄影模式（R）">● 錄影</button>
+    <button type="button" data-notes title="顯示旁白稿（N）">講稿</button>
+    <button type="button" data-fullscreen title="全螢幕（F）">全螢幕</button>
+    <button type="button" data-help title="快捷鍵（?）">?</button>
+    <a href="index.html" title="回到評審入口">退出</a>
+  </nav>
+
+  <aside class="presenter-notes" aria-live="polite">
+    <header><small data-note-time>00:00–00:10</small><button type="button" data-close-notes aria-label="關閉旁白稿">×</button></header>
+    <h2 data-note-title>開場｜把問題接住</h2>
+    <p data-note-copy></p>
+    <footer>按 N 隱藏講稿；錄影模式會自動隱藏控制列與講稿。</footer>
+  </aside>
+
+  <div class="record-badge">2:00 DEMO</div>
+
+  <div class="help" role="dialog" aria-modal="true" aria-label="操作說明">
+    <div class="help-card">
+      <h2>兩分鐘投影片操作</h2>
+      <p>按「錄影」會回到第一頁、嘗試進入全螢幕並開始精準 2:00 自動播放。</p>
+      <div class="shortcuts">
+        <div><kbd>Space</kbd><span>播放／暫停</span></div>
+        <div><kbd>R</kbd><span>從頭錄影</span></div>
+        <div><kbd>← →</kbd><span>上一頁／下一頁</span></div>
+        <div><kbd>N</kbd><span>顯示／隱藏講稿</span></div>
+        <div><kbd>F</kbd><span>切換全螢幕</span></div>
+        <div><kbd>Home</kbd><span>回到第一頁</span></div>
+      </div>
+      <button type="button" data-close-help>開始準備</button>
+    </div>
+  </div>
+
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll('.slide')];
+      const durations = slides.map(slide => Number(slide.dataset.duration) * 1000);
+      const starts = durations.map((_, index) => durations.slice(0, index).reduce((sum, value) => sum + value, 0));
+      const total = durations.reduce((sum, value) => sum + value, 0);
+      const notes = [
+        '在偏鄉，學生缺的不是問題，而是有人把問題接住。Fellow 學伴，讓每次提問都走向真正能採取的下一步。',
+        '我們把旅程串成同一個入口：先問懂課業、找到公共資源、在關鍵時刻收到提醒，再把必要訊號交給教師與地方決策者。',
+        '學生從六個理化主題開始，提出卡住的地方。學伴提供分步解釋與教材依據，並用可調參數的動畫，把力、質量與加速度變成能操作、能觀察、能檢核的學習過程。',
+        '當問題不是課業，而是就學、農業或家庭需求，學伴先協助整理條件，再推薦可能的公共資源與申請下一步。這是方向建議，不冒充正式資格核定。',
+        '重要資訊不必等學生再次提問。通知會清楚說明為什麼收到、何時截止，以及下一步能去哪裡，已讀狀態也會被保存。',
+        '在取得授權後，教師看到的是學習摘要：哪些概念反覆卡住、哪些學生需要關注，以及下一堂課該安排什麼複習，而不是翻閱所有原始對話。',
+        '政府端只接收匿名聚合後的地區趨勢，例如互動量、資源需求與主題變化。姓名和原始對話不會進入這個畫面，讓需求能被看見，個人仍被保護。',
+        '這就是 Fellow 學伴：學生得到理解與行動，教師得到可執行的教學線索，政府得到匿名需求洞察。它不只回答一個問題，而是把幫助送到下一個能採取行動的人。'
+      ];
+
+      const $ = selector => document.querySelector(selector);
+      const playButton = $('[data-play]');
+      const progress = $('[data-progress]');
+      const elapsedLabel = $('[data-elapsed]');
+      const positionLabel = $('[data-position]');
+      const noteTime = $('[data-note-time]');
+      const noteTitle = $('[data-note-title]');
+      const noteCopy = $('[data-note-copy]');
+      let index = 0;
+      let elapsed = 0;
+      let playing = false;
+      let lastFrame = 0;
+      let animationFrame = 0;
+      let hideTimer = 0;
+
+      const formatTime = milliseconds => {
+        const seconds = Math.max(0, Math.min(total, Math.floor(milliseconds / 1000)));
+        return `${String(Math.floor(seconds / 60)).padStart(2, '0')}:${String(seconds % 60).padStart(2, '0')}`;
+      };
+
+      const updateNotes = () => {
+        noteTime.textContent = `${formatTime(starts[index])}–${formatTime(starts[index] + durations[index])}`;
+        noteTitle.textContent = slides[index].dataset.title;
+        noteCopy.textContent = notes[index];
+      };
+
+      const activate = nextIndex => {
+        index = Math.max(0, Math.min(slides.length - 1, nextIndex));
+        slides.forEach((slide, slideIndex) => slide.classList.toggle('active', slideIndex === index));
+        positionLabel.textContent = `${index + 1} / ${slides.length}`;
+        updateNotes();
+      };
+
+      const render = () => {
+        elapsedLabel.textContent = formatTime(elapsed);
+        progress.style.width = `${Math.min(100, elapsed / total * 100)}%`;
+        const current = Math.min(slides.length - 1, starts.findLastIndex(start => start <= elapsed));
+        if (current !== index) activate(current);
+      };
+
+      const pause = () => {
+        playing = false;
+        playButton.textContent = elapsed >= total ? '重播' : '播放';
+        cancelAnimationFrame(animationFrame);
+      };
+
+      const tick = timestamp => {
+        if (!playing) return;
+        if (!lastFrame) lastFrame = timestamp;
+        elapsed += timestamp - lastFrame;
+        lastFrame = timestamp;
+        if (elapsed >= total) {
+          elapsed = total;
+          activate(slides.length - 1);
+          render();
+          pause();
+          document.body.classList.remove('record-mode');
+          document.body.classList.remove('controls-hidden');
+          return;
+        }
+        render();
+        animationFrame = requestAnimationFrame(tick);
+      };
+
+      const play = () => {
+        if (elapsed >= total) {
+          elapsed = 0;
+          activate(0);
+        }
+        playing = true;
+        lastFrame = 0;
+        playButton.textContent = '暫停';
+        animationFrame = requestAnimationFrame(tick);
+      };
+
+      const togglePlay = () => playing ? pause() : play();
+      const goTo = nextIndex => {
+        activate(nextIndex);
+        elapsed = starts[index];
+        lastFrame = 0;
+        render();
+      };
+
+      const toggleFullscreen = async () => {
+        try {
+          if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+          else await document.exitFullscreen();
+        } catch (_) {}
+      };
+
+      const enterFullscreen = async () => {
+        try {
+          if (!document.fullscreenElement) await document.documentElement.requestFullscreen();
+        } catch (_) {}
+      };
+
+      const revealControls = () => {
+        document.body.classList.remove('controls-hidden');
+        clearTimeout(hideTimer);
+        if (document.body.classList.contains('record-mode')) {
+          hideTimer = setTimeout(() => document.body.classList.add('controls-hidden'), 1300);
+        }
+      };
+
+      const startRecording = async () => {
+        pause();
+        goTo(0);
+        document.body.classList.remove('notes-open', 'help-open');
+        document.body.classList.add('record-mode', 'controls-hidden');
+        await enterFullscreen();
+        play();
+      };
+
+      $('[data-prev]').addEventListener('click', () => goTo(index - 1));
+      $('[data-next]').addEventListener('click', () => goTo(index + 1));
+      playButton.addEventListener('click', togglePlay);
+      $('[data-record]').addEventListener('click', startRecording);
+      $('[data-fullscreen]').addEventListener('click', toggleFullscreen);
+      $('[data-notes]').addEventListener('click', () => document.body.classList.toggle('notes-open'));
+      $('[data-close-notes]').addEventListener('click', () => document.body.classList.remove('notes-open'));
+      $('[data-help]').addEventListener('click', () => document.body.classList.add('help-open'));
+      $('[data-close-help]').addEventListener('click', () => document.body.classList.remove('help-open'));
+      document.addEventListener('mousemove', revealControls);
+
+      document.querySelector('[data-deck]').addEventListener('click', event => {
+        if (playing || event.target.closest('a,button')) return;
+        const bounds = event.currentTarget.getBoundingClientRect();
+        goTo(index + (event.clientX < bounds.left + bounds.width / 2 ? -1 : 1));
+      });
+
+      document.addEventListener('keydown', event => {
+        if (event.target.matches('button,a,input')) return;
+        if (['ArrowRight', 'PageDown'].includes(event.key)) goTo(index + 1);
+        else if (['ArrowLeft', 'PageUp'].includes(event.key)) goTo(index - 1);
+        else if (event.key === 'Home') goTo(0);
+        else if (event.key === 'End') goTo(slides.length - 1);
+        else if (event.key === ' ') { event.preventDefault(); togglePlay(); }
+        else if (event.key.toLowerCase() === 'r') startRecording();
+        else if (event.key.toLowerCase() === 'n') document.body.classList.toggle('notes-open');
+        else if (event.key.toLowerCase() === 'f') toggleFullscreen();
+        else if (event.key === '?' || event.key === '/') document.body.classList.toggle('help-open');
+        else if (event.key === 'Escape') document.body.classList.remove('notes-open', 'help-open');
+      });
+
+      const params = new URLSearchParams(location.search);
+      const requestedSlide = Number(params.get('slide'));
+      if (requestedSlide >= 1 && requestedSlide <= slides.length) goTo(requestedSlide - 1);
+      else { activate(0); render(); }
+      if (params.get('autoplay') === '1') setTimeout(play, 700);
+
+      window.fellowDeck = { play, pause, goTo, startRecording, totalSeconds: total / 1000, durations: durations.map(value => value / 1000) };
+    })();
+  </script>
+</body>
+</html>
