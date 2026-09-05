@@ -2,7 +2,7 @@
   {
     "id": "demo-agriculture-disaster-aid",
     "category": "agriculture",
-    "title": "農業天然災害救助（Demo 資源方向）",
+    "title": "農業天然災害救助",
     "agency": "農業部與所在地公所",
     "region": null,
     "summary": "協助整理農作物受災後可向所在地公所確認的救助方向；這不是資格核定。",
@@ -23,7 +23,7 @@
   {
     "id": "demo-agriculture-finance-consultation",
     "category": "agriculture",
-    "title": "農業經營資金諮詢（Demo 資源方向）",
+    "title": "農業經營資金諮詢",
     "agency": "農業金融相關承辦窗口",
     "region": null,
     "summary": "提供農業經營或復耕資金需求的諮詢方向，不表示符合貸款或利息補貼資格。",
@@ -44,7 +44,7 @@
   {
     "id": "demo-disaster-relief-placement",
     "category": "disaster",
-    "title": "災害救助與安置協助（Demo 資源方向）",
+    "title": "災害救助與安置協助",
     "agency": "所在地縣市政府社會局（處）",
     "region": null,
     "summary": "住家因災害受損時，可先向受災地公所或地方安置窗口說明住宿與生活需求。",
@@ -65,7 +65,7 @@
   {
     "id": "demo-disaster-home-damage-consultation",
     "category": "disaster",
-    "title": "住家受災生活重建諮詢（Demo 資源方向）",
+    "title": "住家受災生活重建諮詢",
     "agency": "受災地公所與地方政府",
     "region": null,
     "summary": "協助整理住家受損後要向地方窗口詢問的生活重建項目。",
@@ -86,7 +86,7 @@
   {
     "id": "demo-education-aid-and-loan",
     "category": "education",
-    "title": "就學貸款與助學資源（Demo 資源方向）",
+    "title": "就學貸款與助學資源",
     "agency": "教育部與就讀學校",
     "region": null,
     "summary": "由學校協助確認助學金、學雜費減免或就學貸款的條件與程序。",
@@ -107,7 +107,7 @@
   {
     "id": "demo-education-admission-consultation",
     "category": "education",
-    "title": "升學資訊諮詢（Demo 資源方向）",
+    "title": "升學資訊諮詢",
     "agency": "就讀學校輔導或教務窗口",
     "region": null,
     "summary": "協助學生找到可確認現行升學管道與校內時程的窗口。",
@@ -128,7 +128,7 @@
   {
     "id": "demo-economy-child-family-support",
     "category": "economy",
-    "title": "弱勢家庭兒少生活扶助（Demo 資源方向）",
+    "title": "弱勢家庭兒少生活扶助",
     "agency": "衛生福利部與所在地社會局（處）",
     "region": null,
     "summary": "家庭收入變動且有兒少照顧需求時，可向戶籍地社福窗口諮詢。",
@@ -149,7 +149,7 @@
   {
     "id": "demo-economy-emergency-support",
     "category": "economy",
-    "title": "急難與基本生活支持諮詢（Demo 資源方向）",
+    "title": "急難與基本生活支持諮詢",
     "agency": "所在地公所或社會福利服務中心",
     "region": null,
     "summary": "家庭遭遇突發變故、基本生活有困難時，可先向地方社福窗口說明急迫需求。",
@@ -170,7 +170,7 @@
   {
     "id": "demo-health-mental-support",
     "category": "health",
-    "title": "心理諮詢與醫療協助（Demo 資源方向）",
+    "title": "心理諮詢與醫療協助",
     "agency": "衛生福利部與所在地衛生局",
     "region": null,
     "summary": "有壓力或睡眠困擾時，可先向學校輔導室或社區心理衛生中心詢問。",
@@ -191,7 +191,7 @@
   {
     "id": "demo-health-medical-navigation",
     "category": "health",
-    "title": "醫療與照護資源導引（Demo 資源方向）",
+    "title": "醫療與照護資源導引",
     "agency": "所在地衛生局或醫療服務窗口",
     "region": null,
     "summary": "協助整理醫療或照護需求，找到可說明現行服務的地方窗口。",
@@ -212,7 +212,7 @@
   {
     "id": "demo-other-welfare-referral",
     "category": "other",
-    "title": "社會福利諮詢與轉介（Demo 資源方向）",
+    "title": "社會福利諮詢與轉介",
     "agency": "所在地縣市政府社會局（處）",
     "region": null,
     "summary": "不確定問題分類時，可從所在地社福中心或公所開始整理需求。",
@@ -233,7 +233,7 @@
   {
     "id": "demo-other-caregiver-consultation",
     "category": "other",
-    "title": "家庭照顧需求諮詢（Demo 資源方向）",
+    "title": "家庭照顧需求諮詢",
     "agency": "所在地社會福利或照顧服務窗口",
     "region": null,
     "summary": "家中有照顧安排困難但不確定服務類型時，可先請地方窗口協助分類。",

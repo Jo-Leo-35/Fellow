@@ -271,7 +271,7 @@ function ResourceRecommendationCard({
               {scenario.title}
             </Text>
             <Text mt="5px" fontSize="12px" color="#728491" lineHeight="1.55">
-              依示範情境整理，實際需求與資格待確認
+              申請資格與受理方式，由承辦單位確認。
             </Text>
           </Box>
           {scenario.key === "agriculture" ? (
@@ -793,11 +793,11 @@ function ResourceChatDemo({ scenario: initialScenario, question }: { scenario: R
                 <Text color="navy.800" fontSize="16px" fontWeight={800}>{scenario.label}資源諮詢</Text>
               </HStack>
               <Badge px="8px" py="4px" borderRadius="full" bg="white" color="#6C808D" fontSize="10px">
-                示範情境
+                資源諮詢
               </Badge>
             </HStack>
             <Text mt="7px" color="#6C808D" fontSize="11.5px" lineHeight="1.65">
-              先看看情境中的協助方向，再點選問題繼續了解。
+              查看申請資訊，或直接提問，讓學伴幫你整理下一步。
             </Text>
             <Flex as="nav" aria-label="切換資源分類" mt="11px" gap="6px" wrap="wrap">
               {resourceCategories.map((category) => {

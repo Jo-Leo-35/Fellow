@@ -103,7 +103,7 @@ export function StudentShell({
           )}
         </Flex>
 
-        <HStack px="14px" py="4px" bg="brand.50" justify="space-between"><Text fontSize="10px">{session.runtimeMode === "offline_demo" ? "AI 離線示範" : `AI 線上服務 · ${identity.displayName}${usage.data ? ` · 今日剩餘 ${usage.data.remaining}` : ""}`}</Text>{session.runtimeMode === "live" && <Text as="button" fontSize="10px" onClick={logout}>切換身分</Text>}</HStack>
+        <HStack px="14px" py="4px" bg="brand.50" justify="space-between"><Text fontSize="10px">{session.runtimeMode === "offline_demo" ? "AI 離線模式" : `AI 線上服務 · ${identity.displayName}${usage.data ? ` · 今日剩餘 ${usage.data.remaining}` : ""}`}</Text>{session.runtimeMode === "live" && <Text as="button" fontSize="10px" onClick={logout}>切換身分</Text>}</HStack>
         <Box as="main" flex="1" minH={0} overflowY="auto" className="soft-scrollbar" p={contentPadding}>
           {children}
         </Box>

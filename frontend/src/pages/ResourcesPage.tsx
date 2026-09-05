@@ -3,12 +3,6 @@ import {
   Box,
   Button,
   Circle,
-  Drawer,
-  DrawerBody,
-  DrawerCloseButton,
-  DrawerContent,
-  DrawerHeader,
-  DrawerOverlay,
   Flex,
   HStack,
   Icon,
@@ -37,9 +31,7 @@ import {
   CloudLightning,
   GraduationCap,
   HandCoins,
-  HeartHandshake,
   HeartPulse,
-  History,
   Landmark,
   MessageCircleQuestion,
   Search,
@@ -101,7 +93,8 @@ function ResourceDetailsModal({
 }) {
   const query=useQuery({queryKey:['resources','detail',resource?.programId],queryFn:({signal})=>resourcesApi.getDetail(resource!.programId,{signal}),enabled:Boolean(resource)});
   if (!resource) return null;
-  const detail = actualDetail(query.data??resource);
+  const program = query.data ?? resource;
+  const detail = actualDetail(program);
   const status = statusVisuals[resource.tone] ?? statusVisuals.orange;
 
   return (
@@ -178,9 +171,45 @@ function ResourceDetailsModal({
             </HStack>
           </Box>
 
-          <Box mt="14px"><Text fontSize="12px">申請期限：{(query.data??resource).deadline??'需向主管機關確認'}</Text>{(query.data??resource).documents.map(document=><Text key={document} fontSize="12px" mt="5px">• {document}</Text>)}{(query.data??resource).sources.map(item=><Box key={item.sourceId} mt="10px"><Text fontSize="11px" fontWeight="700">{item.title}</Text><Text fontSize="11px" lineHeight="1.8">{item.excerpt}</Text>{item.url&&<Button as="a" href={item.url} target="_blank" rel="noopener noreferrer" size="xs" variant="link">查看原始來源</Button>}</Box>)}</Box>
+          <VStack mt="18px" align="stretch" spacing="16px" color="#465E70">
+            <Box>
+              <Text color="navy.700" fontSize="13px" fontWeight="800">洽詢與申請</Text>
+              <Text mt="6px" fontSize="12px" lineHeight="1.7">
+                洽詢窗口：{program.applicationWindow ?? program.agency}
+              </Text>
+              <Text mt="4px" fontSize="12px" lineHeight="1.7">
+                申請期限：{program.deadline ?? "請向承辦單位確認"}
+              </Text>
+            </Box>
+            {program.documents.length > 0 && (
+              <Box>
+                <Text color="navy.700" fontSize="13px" fontWeight="800">準備資料</Text>
+                <Box as="ul" mt="6px" pl="18px">
+                  {program.documents.map(document => (
+                    <Text as="li" key={document} mt="4px" fontSize="12px" lineHeight="1.7">{document}</Text>
+                  ))}
+                </Box>
+              </Box>
+            )}
+            {program.sources.length > 0 && (
+              <Box pt="14px" borderTop="1px solid #E9F0F2">
+                <Text color="navy.700" fontSize="13px" fontWeight="800">參考資訊</Text>
+                {program.sources.map(item => (
+                  <Box key={item.sourceId} mt="10px">
+                    <Text fontSize="12px" fontWeight="700">{item.title}</Text>
+                    <Text mt="4px" fontSize="11.5px" lineHeight="1.8">{item.excerpt}</Text>
+                    {item.url && (
+                      <Button as="a" href={item.url} target="_blank" rel="noopener noreferrer" mt="6px" size="xs" variant="link">
+                        查看原始來源
+                      </Button>
+                    )}
+                  </Box>
+                ))}
+              </Box>
+            )}
+          </VStack>
           <Text mt="13px" color="#83939E" fontSize="10.5px" lineHeight="1.55">
-            這是 Demo 初步推薦，實際資格與申請期限仍以主管機關最新公告為準。
+            申請資格、應備文件與受理期限，以主管機關最新公告為準。
           </Text>
         </ModalBody>
 
@@ -254,7 +283,7 @@ export default function ResourcesPage() {
                 <Icon as={Sparkles} boxSize="17px" color="warning" fill="#F6A63C" />
               </HStack>
               <Text mt="4px" color="#6C8190" fontSize="11.5px" lineHeight="1.65">
-                選擇問題類別，或看看學伴為你整理的推薦。
+                補助、就學、健康支持，從你的需求開始找。
               </Text>
             </Box>
           </Flex>
@@ -373,7 +402,7 @@ export default function ResourcesPage() {
               </SimpleGrid>
             ) : (
               <Text mt="14px" py="15px" color="#728694" fontSize="11.5px" textAlign="center">
-                沒有符合的問題分類，可以查看下方推薦。
+                沒有符合的問題分類，可以查看下方資源。
               </Text>
             )}
           </Box>
@@ -384,15 +413,15 @@ export default function ResourcesPage() {
                 <HStack spacing="7px">
                   <Icon as={Sparkles} boxSize="16px" color="brand.600" />
                   <Text id="recommendations-heading" as="h2" color="navy.800" fontSize="16px" fontWeight="800">
-                    為你推薦的資源
+                    資源與申請資訊
                   </Text>
                 </HStack>
                 <Text mt="5px" color="#718593" fontSize="10.5px" lineHeight="1.55">
-                  根據你的地區與家庭情況，這些資源可能適合你。
+                  查看服務內容、準備資料與洽詢窗口。
                 </Text>
               </Box>
               <Badge flexShrink={0} px="8px" py="4px" borderRadius="full" bg="brand.50" color="brand.700" fontSize="9px">
-                學伴推薦
+                資源總覽
               </Badge>
             </Flex>
 
@@ -403,7 +432,7 @@ export default function ResourcesPage() {
                   const status = statusVisuals[resource.tone] ?? statusVisuals.orange;
                   return (
                     <Button
-                      key={resource.title}
+                      key={resource.programId}
                       variant="unstyled"
                       display="flex"
                       w="full"
@@ -466,10 +495,10 @@ export default function ResourcesPage() {
                   <Icon as={Search} boxSize="19px" />
                 </Circle>
                 <Text mt="9px" color="navy.700" fontSize="12.5px" fontWeight="700">
-                  暫時找不到符合的推薦
+                  {normalizedQuery ? "找不到符合的資源" : "目前尚無資源"}
                 </Text>
                 <Text mt="3px" color="#80919C" fontSize="10.5px">
-                  換個關鍵字，或從上方分類開始提問。
+                  {normalizedQuery ? "換個關鍵字，或從上方分類開始提問。" : "可以從上方分類提問，讓學伴協助整理需求。"}
                 </Text>
               </Surface>
             )}

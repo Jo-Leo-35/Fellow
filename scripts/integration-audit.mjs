@@ -55,7 +55,7 @@ try {
   for (const role of ["student", "teacher", "government"]) {
     await run(`${role}-automatic-offline-session`, async (page, posts) => {
       await login(page, role);
-      if (role === "student") await page.getByText(/AI 離線示範/).waitFor();
+      if (role === "student") await page.getByText("AI 離線模式", { exact: true }).waitFor();
       const overflow = await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth);
       assert.ok(overflow <= 1, "320px authenticated layout fits the viewport");
       await page.reload({ waitUntil: "networkidle" });

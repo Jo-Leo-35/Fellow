@@ -55,8 +55,8 @@ async function run(name, path, viewport, checks) {
 async function checkCategory(page, category) {
   const title = page.getByRole("heading", { level: 1 });
   await title.waitFor();
-  assert.equal((await title.innerText()).replace(/（Demo 資源方向）$/, ""), category.title, "The category-specific title is preserved with its explicit Demo disclosure");
-  await page.getByText(/離線示範/).first().waitFor();
+  assert.equal(await title.innerText(), category.title, "The category-specific resource title is displayed without a legacy catalog suffix");
+  await page.getByText("AI 離線模式", { exact: true }).waitFor();
   const currentCategory = page.getByRole("link", { name: `切換到${category.label}分類`, exact: true });
   assert.equal(await currentCategory.getAttribute("aria-current"), "page", "Current category is selected in the navigation");
   if (category.key !== "agriculture") {

@@ -154,11 +154,16 @@ export function adaptUsage(wire: UsageWire): UsageView {
   };
 }
 
+function resourceTitle(title: string): string {
+  // Older catalogs and saved conversations still include this presentation suffix.
+  return title.replace(/（Demo 資源方向）$/, "");
+}
+
 export function adaptSource(wire: SourceWire): SourceView {
   return {
     sourceId: wire.source_id,
     sourceType: wire.source_type,
-    title: wire.title,
+    title: wire.source_type === "policy" ? resourceTitle(wire.title) : wire.title,
     publisher: wire.publisher,
     chapter: wire.chapter,
     page: wire.page,
@@ -219,7 +224,7 @@ export function adaptResourceProgram(wire: ResourceProgramWire): ResourceRecomme
   return {
     programId: wire.program_id,
     category: wire.category,
-    title: wire.title,
+    title: resourceTitle(wire.title),
     agency: wire.agency,
     summary: wire.summary,
     eligibilityStatus: wire.eligibility_status,

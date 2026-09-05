@@ -93,7 +93,7 @@ await run("resource recommendation details", "/resource-chat.html", { width: 390
 
 await run("resource list search and modal", "/resources.html", { width: 390, height: 844 }, async (page) => {
   await page.getByRole("textbox", { name: "搜尋資源或問題分類" }).fill("農業");
-  await page.getByRole("button", { name: /查看農業天然災害救助（Demo 資源方向）詳情/ }).click();
+  await page.getByRole("button", { name: /查看農業天然災害救助詳情/ }).click();
   await page.getByRole("dialog").waitFor();
   await page.getByRole("button", { name: "稍後再看" }).click();
 });
