@@ -63,7 +63,7 @@ flowchart TD
     Catalog[原創教材與政策示範 JSON] --> Chroma
     Catalog --> DB
     Agent --> Offline
-    Agent -. live 模式待設定與驗證 .-> Provider[OpenAI 相容 API：文字生成與 Embeddings]
+    Agent .-> Provider[OpenAI 相容 API：文字生成與 Embeddings]
     Provider -. 線上向量檢索 .-> Chroma
 ```
 
@@ -118,7 +118,7 @@ curl --fail http://localhost:45465/health
 
 若使用本次既有工作目錄，請先執行 `cd ~/workspace/FutureAI`，再從設定檔與啟動指令開始。
 
-本機啟動後可開啟以下入口；這些是供自行重現的 localhost 位址，不是表單中的公開展示網址。
+本機啟動後可開啟以下入口；這些是供自行重現的 localhost 位址，不是表單中的公開展示網址，後續會使用 ngrok 代理。
 
 | 入口 | 本機網址 |
 | --- | --- |
