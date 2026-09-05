@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import Field, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from app.schemas.alerts import AlertWire
 from app.schemas.auth import UsageWire
@@ -75,6 +75,11 @@ class AgentChatRequestWire(StrictModel):
     attachment_ids: list[OpaqueId] = Field(max_length=3)
     category: ResourceCategory | None = None
     topic: LearningTopic | None = None
+
+    @field_validator("message", mode="before")
+    @classmethod
+    def trim_message(cls, value: object) -> object:
+        return value.strip() if isinstance(value, str) else value
 
     @model_validator(mode="after")
     def validate_mode_and_content(self) -> AgentChatRequestWire:

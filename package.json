@@ -4,15 +4,20 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite --host 0.0.0.0",
-    "build": "tsc -b && vite build",
-    "preview": "vite preview --host 0.0.0.0",
-    "typecheck": "tsc -b --pretty false",
+    "predev": "node scripts/sync-judge-docs.mjs",
+    "dev": "vite --config frontend/vite.config.ts --host 127.0.0.1",
+    "prebuild": "node scripts/sync-judge-docs.mjs",
+    "build": "tsc -b frontend && vite --config frontend/vite.config.ts build",
+    "preview": "vite --config frontend/vite.config.ts preview --host 127.0.0.1",
+    "typecheck": "tsc -b frontend --pretty false",
     "test:visual": "node scripts/visual-audit.mjs",
     "test:interactions": "node scripts/interaction-audit.mjs",
     "test:categories": "node scripts/resource-category-audit.mjs",
     "test:learning": "node scripts/learning-audit.mjs",
-    "test:dashboards": "node scripts/dashboard-audit.mjs"
+    "test:dashboards": "node scripts/dashboard-audit.mjs",
+    "test:api-client": "node scripts/api-client-audit.mjs",
+    "test:integration": "node scripts/integration-audit.mjs",
+    "test:browser": "npm run test:learning && npm run test:categories && npm run test:dashboards && npm run test:interactions && npm run test:integration && npm run test:visual"
   },
   "dependencies": {
     "@chakra-ui/react": "2.10.9",

@@ -127,11 +127,13 @@ type LearningSubjectWire = "物理" | "化學";
 
 ## 4. Auth、session 與 usage 契約
 
-這是最小 Demo gate，不是正式帳密系統。Server 以設定檔/secret 注入不同 Demo access code，code 對應固定 subject、role 與授權 scope。request 不接受 `requested_role` 或任意 `user_id` 來決定身份。
+這是最小 Demo session bootstrap，不是正式帳密系統。`offline_demo` 可依三個固定入口角色建立既定 seed 身分的 session，不要求操作者輸入存取碼；`live` 則只接受設定檔／secret 注入的 access code。兩種方式都不能提交任意 `user_id` 或自訂授權 scope。
 
 ```ts
 interface DemoSessionRequestWire {
-  access_code: string; // runtime 輸入，1..256；不得寫進 VITE_*、bundle 或文件
+  // 恰好提供一種：offline_demo 使用 role，live 使用 access_code。
+  role?: "student" | "teacher" | "government";
+  access_code?: string; // 1..256；不得寫進 VITE_*、bundle 或文件
 }
 
 interface SessionIdentityWire {
@@ -168,7 +170,7 @@ interface UsageWire {
 Session 規則：
 
 - `POST /auth/demo/session` 交換成功後建立 server-side、opaque Bearer session；token 至多 8 小時有效，session 與 quota ledger 持久存在 SQLite。沒有 refresh endpoint；到期後重新輸入 access code 交換。
-- 前端僅把 token 放記憶體並可同步到 `sessionStorage`，關閉 tab 即消失；不可放 localStorage、URL、log，也不可用 `VITE_*` 硬編。access code 不持久化。收到 401 立即清除 token 並回 access gate。
+- 前端僅把 token 放記憶體並可同步到 `sessionStorage`，關閉 tab 即消失；不可放 localStorage、URL、log，也不可用 `VITE_*` 硬編。access code 不持久化。離線模式收到 401 後重新建立固定角色 session；live 模式回 access gate。
 - 除 session exchange 外，下列所有 API 都要求 `Authorization: Bearer <token>`。Role、subject user id、teacher school/classes 與 government aggregate scope只由 server session 決定。
 - 每個 server-configured Demo identity 綁定固定 principal/user 與 role；重新登入、換發新 token，或先切換到另一角色再切回，都仍使用原 principal 的同一 quota window，不能重置用量。前端不得送 `X-Role`、role query/body 或其他可選 header 改變身份；role 只取自 server 驗證過的 session。
 - Request 中保留 SDD 的 `user_id` 只為 wire 相容；它必須等於 student token subject。不同即回 403 `USER_SCOPE_FORBIDDEN`，不能用它查別人的資料。
@@ -843,14 +845,14 @@ interface ApiErrorWire {
 ## 12. 可重現 Demo flow
 
 1. 以明確 `offline_demo`（無 provider key）或 `live`（有 server-side key）啟動。`GET /health` 應只回健康狀態與 `runtime_mode`，不回 secret；Swagger 列出上述 routes。
-2. 在 access gate runtime 輸入 student Demo code，`POST /auth/demo/session`；以 response token 呼叫 session、usage。UI 顯示目前是離線示範或真實模式。
+2. 在 `offline_demo` 開啟學生入口，自動以 `{ role: "student" }` 呼叫 `POST /auth/demo/session`；以 response token 呼叫 session、usage。UI 顯示目前是離線示範。`live` 模式才要求輸入 student Demo code。
 3. GET profile、conversations、alerts/resources；六分類與 UI labels 正常，有限清單搜尋在 browser。
 4. 可先 POST 一張 JPEG/PNG，取得 `attachment_id` 與 authenticated `download_url`；用新的 `Idempotency-Key` POST `/agent/chat`。成功後有 structured answer、完整 sources、`demo` 與一致 usage。
 5. 以回傳 conversation id 追問；重載後 list/detail 重播相同 message、practice/resource payload 與 sources。刪 history 後 detail 404，list 不再出現。
 6. Resource flow 顯示 `possibly_eligible`/待確認、文件與政府來源；只有按「幫我記住」才 POST suggestion，重載 profile 仍存在；DELETE memory 後消失。
 7. Alerts mark-read 重載仍已讀。UI session-only dismiss 重載可再出現，不能宣稱 server delete。
 8. 重新以 teacher code exchange，dashboard 只顯示授權 roster/learning summary，五分頁、filters、student detail、CSV 與 local review plan正常；不得看到家庭或 raw chat。
-9. 重新以 government code exchange，六分頁只顯示 aggregate。學生端新增的 persisted primary Insight 在下一次 snapshot 改變對應 count/trend；payload/CSV 不含個人、conversation 或 message 欄位。
+9. 開啟政府入口；離線模式自動建立 government session，live 模式以 government code exchange。六分頁只顯示 aggregate。學生端新增的 persisted primary Insight 在下一次 snapshot 改變對應 count/trend；payload/CSV 不含個人、conversation 或 message 欄位。
 10. 驗證 invalid token 401、wrong role/owner 403、quota/rate 429、upload 413/415、provider 502/timeout 504 與 offline unsupported 503；任何錯誤都不顯示為 AI 成功，也不錯扣 quota。
 
 ## 13. 後續 task acceptance

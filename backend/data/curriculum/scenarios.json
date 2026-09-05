@@ -5,7 +5,7 @@
     "subject": "物理",
     "title": "牛頓力學",
     "canonical_question": "牛頓力學怎麼解釋：物體受力了，為什麼不一定會加速？",
-    "keywords": ["牛頓力學", "第二定律", "合力", "慣性", "加速度"],
+    "keywords": ["牛頓力學", "牛頓", "牛顿", "牛顿力学", "牛頓第二定律", "第二運動定律", "第一運動定律", "第三運動定律", "第一定律", "第二定律", "第三定律", "合力", "慣性", "加速度"],
     "answer_payload": {
       "scenario_id": "newton",
       "animation_topic": "newton",
@@ -23,7 +23,7 @@
       "analogy": "想像兩個人從相反方向、用一樣大的力拉同一個箱子。每個人都很用力，但箱子受到的合力仍可能是零。",
       "misconception": "作用力與反作用力不會在同一物體的受力圖中互相抵消，因為它們作用在不同物體上。",
       "source_ids": ["newton-1", "newton-2", "newton-3"],
-      "practice": {"question": "箱子正以等速度直線前進，它受到的合外力是多少？", "options": ["一定向前", "為零，因為速度沒有改變", "一定向後"], "answer_index": 1, "explanation": "等速度直線運動代表加速度為零，因此合力為零。"},
+      "practice": {"question": "箱子正以等速度直線前進，它受到的合外力是多少？", "options": ["一定向前", "為零，因為速度沒有改變", "一定向後"], "answer_index": 1, "explanation": "等速度直線運動代表加速度為零，因此合力為零；推力可以剛好與摩擦力平衡。"},
       "follow_ups": [{"question": "為什麼公車急煞時，人會往前傾？", "title": "身體保留原本的速度"}]
     }
   },
@@ -33,7 +33,7 @@
     "subject": "物理",
     "title": "熱力學第一定律",
     "canonical_question": "熱力學怎麼解釋：熱量、溫度和內能有什麼不同？",
-    "keywords": ["熱力學", "第一定律", "內能", "熱量", "絕熱"],
+    "keywords": ["熱力學第一定律", "熱力學", "热力学", "第一定律", "內能", "内能", "熱量", "絕熱", "等溫", "打氣筒"],
     "answer_payload": {
       "scenario_id": "thermodynamics",
       "animation_topic": "thermodynamics",
@@ -48,10 +48,10 @@
         {"title": "替系統記一份能量帳", "body": "系統吸收 100 J 熱量，再對外做功 40 J，內能增加 60 J。", "source_ids": ["thermodynamics-2"]},
         {"title": "沒有吸熱也可能變熱", "body": "快速壓縮氣體可近似沒有熱交換，但外界做功仍使內能增加。", "source_ids": ["thermodynamics-3"]}
       ],
-      "analogy": "把內能想成帳戶餘額，熱和功是兩種轉帳方式。",
+      "analogy": "把內能想成帳戶餘額。熱和功是兩種轉帳方式；溫度則不是餘額，所以同溫的一杯水與一桶水不代表有相同的內能。",
       "misconception": "沒有吸熱不代表溫度一定不會上升；外界做功也可以增加內能。",
       "source_ids": ["thermodynamics-1", "thermodynamics-2", "thermodynamics-3"],
-      "practice": {"question": "氣體吸熱 100 J，同時對外做功 40 J，內能怎麼改變？", "options": ["增加 140 J", "增加 60 J", "減少 60 J"], "answer_index": 1, "explanation": "ΔU = Q − W = 100 − 40 = 60 J。"},
+      "practice": {"question": "氣體吸熱 100 J，同時對外做功 40 J，內能怎麼改變？", "options": ["增加 140 J", "增加 60 J", "減少 60 J"], "answer_index": 1, "explanation": "採用系統對外做功為正：ΔU = Q − W = 100 − 40 = 60 J。"},
       "follow_ups": [{"question": "絕熱和等溫有什麼不同？", "title": "絕熱管熱交換，等溫管溫度"}]
     }
   },
@@ -61,7 +61,7 @@
     "subject": "物理",
     "title": "熵與熱力學第二定律",
     "canonical_question": "熵增加是什麼意思？為什麼冰箱還能把水變成冰？",
-    "keywords": ["熵", "第二定律", "孤立系統", "微觀狀態", "冰箱"],
+    "keywords": ["熱力學第二定律", "第二定律", "熵增加", "熵增", "熵", "entropy", "孤立系統", "微觀狀態"],
     "answer_payload": {
       "scenario_id": "entropy",
       "animation_topic": "entropy",
@@ -76,10 +76,10 @@
         {"title": "把冰箱外面的房間算進來", "body": "水結冰時水的熵可以降低；冰箱耗電，把熱排到室內。", "source_ids": ["entropy-2"]},
         {"title": "檢查的是總和", "body": "把水、冰箱與所有相關環境一起計算，總熵仍不減。", "source_ids": ["entropy-2"]}
       ],
-      "analogy": "兩種不同理想氣體混合後可及的微觀排列遠多於完全分開時。",
+      "analogy": "移除隔板後，兩種不同的理想氣體容易混在一起，因為「混合」的微觀排列方式遠多於「各待一邊」。這是機率與狀態數，不是粒子偏愛混亂。",
       "misconception": "不是任何局部的熵都只能增加；第二定律限制的是孤立整體的總熵。",
       "source_ids": ["entropy-1", "entropy-2", "entropy-3"],
-      "practice": {"question": "冰箱中的水結冰、熵降低，是否違反第二定律？", "options": ["會", "不會，要連同環境一起計算總熵", "不會，因為總熵消失"], "answer_index": 1, "explanation": "計入冰箱耗電與向環境排熱後，總熵仍不減。"},
+      "practice": {"question": "冰箱中的水結冰、熵降低，是否違反第二定律？", "options": ["會", "不會，要連同環境一起計算總熵", "不會，因為總熵消失"], "answer_index": 1, "explanation": "冰箱耗電並向環境排熱；局部熵可以降低，但計入所有相關環境後，總熵仍不減。"},
       "follow_ups": [{"question": "兩種氣體混合，為什麼熵會增加？", "title": "混合後可及的排列方式更多"}]
     }
   },
@@ -89,7 +89,7 @@
     "subject": "化學",
     "title": "化學動態平衡",
     "canonical_question": "化學平衡時，反應還在進行嗎？為什麼濃度不再改變？",
-    "keywords": ["化學平衡", "動態平衡", "平衡常數", "可逆反應"],
+    "keywords": ["化學平衡", "化学平衡", "動態平衡", "平衡常數", "平衡", "勒沙特列", "可逆反應"],
     "answer_payload": {
       "scenario_id": "equilibrium",
       "animation_topic": "equilibrium",
@@ -104,10 +104,10 @@
         {"title": "一進一出剛好相同", "body": "正逆反應速率相等，因此巨觀濃度不再改變。", "source_ids": ["equilibrium-1"]},
         {"title": "區分速度和最後比例", "body": "催化劑讓反應更快達到平衡，但不改變平衡常數。", "source_ids": ["equilibrium-2", "equilibrium-3"]}
       ],
-      "analogy": "兩個房間每分鐘各有相同人數走向對面，房內人數可維持不變，但人仍在移動。",
+      "analogy": "想像兩個房間每分鐘各有 3 個人走到對面。房間裡的人數可以一直不變，但人仍在移動；兩間房的人數也不必相等。",
       "misconception": "化學平衡不表示反應停止。",
       "source_ids": ["equilibrium-1", "equilibrium-2", "equilibrium-3"],
-      "practice": {"question": "已達平衡的系統加入催化劑會如何？", "options": ["往生成物移動", "平衡常數變大", "組成不變，正逆反應都加快"], "answer_index": 2, "explanation": "催化劑改變到達平衡的速率，不改變平衡組成。"},
+      "practice": {"question": "已達平衡的系統加入催化劑會如何？", "options": ["往生成物移動", "平衡常數變大", "組成不變，正逆反應都加快"], "answer_index": 2, "explanation": "催化劑改變到達平衡的速率，不改變同一溫度下的平衡常數與平衡組成。"},
       "follow_ups": [{"question": "加入催化劑，平衡會往生成物方向移動嗎？", "title": "催化劑改變速度，不改變平衡位置"}]
     }
   },
@@ -117,7 +117,7 @@
     "subject": "化學",
     "title": "化學鍵與氫鍵",
     "canonical_question": "化學鍵和氫鍵有什麼不同？為什麼水沸騰不會變成氫氣、氧氣？",
-    "keywords": ["化學鍵", "共價鍵", "氫鍵", "水分子", "食鹽"],
+    "keywords": ["化學鍵", "化学键", "共價鍵", "共价键", "氫鍵", "氢键", "離子鍵", "水分子", "食鹽", "水合"],
     "answer_payload": {
       "scenario_id": "bonding",
       "animation_topic": "bonding",
@@ -132,10 +132,10 @@
         {"title": "看不同水分子之間", "body": "水分子的氫端可與另一個水分子的氧端形成氫鍵。", "source_ids": ["bonding-1"]},
         {"title": "沸騰讓分子分開", "body": "一般沸騰主要克服分子間吸引；分子內的 O–H 共價鍵仍在。", "source_ids": ["bonding-2"]}
       ],
-      "analogy": "沸騰像不同小組彼此散開，沒有把每一組內部牽著的手拆開。",
+      "analogy": "把每個水分子想成牽緊手的一小組人。沸騰像不同小組彼此散開，並沒有把每一組內部牽著的手拆開。這個比喻只用來區分作用的層級。",
       "misconception": "一般沸騰不會切斷水分子內的 O–H 共價鍵。",
       "source_ids": ["bonding-1", "bonding-2"],
-      "practice": {"question": "水沸騰成為水蒸氣時何者正確？", "options": ["分解成氫氣和氧氣", "分子間吸引被克服，H₂O 仍維持", "共價鍵都轉成氫鍵"], "answer_index": 1, "explanation": "沸騰改變相態，分子內共價鍵仍維持。"},
+      "practice": {"question": "水沸騰成為水蒸氣時何者正確？", "options": ["分解成氫氣和氧氣", "分子間吸引被克服，H₂O 仍維持", "共價鍵都轉成氫鍵"], "answer_index": 1, "explanation": "沸騰改變相態，主要克服分子間的吸引；分子內的 O–H 共價鍵仍維持。"},
       "follow_ups": [{"question": "食鹽溶於水時，是變成新的水分子嗎？", "title": "離子離開晶格，被水分子包圍"}]
     }
   },
@@ -145,7 +145,7 @@
     "subject": "化學",
     "title": "反應速率與活化能",
     "canonical_question": "反應速率怎麼決定？為什麼溫度升高，反應通常會變快？",
-    "keywords": ["反應速率", "活化能", "碰撞理論", "Arrhenius", "表面積"],
+    "keywords": ["反應速率", "反应速率", "反應速度", "反應快慢", "反應變快", "活化能", "碰撞理論", "有效碰撞", "Arrhenius", "表面積"],
     "answer_payload": {
       "scenario_id": "reaction-rate",
       "animation_topic": "reaction-rate",
@@ -160,10 +160,10 @@
         {"title": "升溫讓更多粒子跨過門檻", "body": "溫度升高通常使速率常數變大。", "source_ids": ["reaction-rate-1"]},
         {"title": "催化劑提供較低門檻", "body": "催化劑提供較低活化能的另一條反應路徑。", "source_ids": ["reaction-rate-2"]}
       ],
-      "analogy": "升溫像更多人具備越過山丘的能力；催化劑像提供較低的山路。",
+      "analogy": "像一群人要翻越山丘：升溫好比更多人具備越過山丘的能力；催化劑好比提供較低的山路。這是理解能量障礙的比喻，實際粒子不是人在行走。",
       "misconception": "濃度加倍不代表速率一定加倍，實際關係要看速率定律。",
       "source_ids": ["reaction-rate-1", "reaction-rate-2", "reaction-rate-3"],
-      "practice": {"question": "催化劑為什麼通常能讓反應變快？", "options": ["提供活化能較低的路徑", "憑空增加總能量", "把粒子加熱"], "answer_index": 0, "explanation": "催化劑提供另一條較低活化能的路徑。"},
+      "practice": {"question": "催化劑為什麼通常能讓反應變快？", "options": ["提供活化能較低的路徑", "憑空增加總能量", "把粒子加熱"], "answer_index": 0, "explanation": "催化劑提供另一條較低活化能的路徑，不會改變反應物與生成物的能量差。"},
       "follow_ups": [{"question": "反應物濃度加倍，反應速率一定也加倍嗎？", "title": "要先知道反應的速率定律"}]
     }
   }

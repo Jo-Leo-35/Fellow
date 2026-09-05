@@ -42,6 +42,7 @@ from app.db.models import (
 from app.schemas.chat import LearningAnswerWire, MemorySuggestionWire
 from app.schemas.conversations import ConversationMessageWire
 from app.schemas.resources import ResourceProgramWire, SourceWire
+from scripts.catalog_migrations import upgrade_legacy_curriculum_feedback
 
 
 MUTABLE_SEED_KEY = "demo_seed_v1_mutable_complete"
@@ -335,7 +336,7 @@ def seed_identities_and_roster(session: Session) -> list[dict[str, str]]:
             User,
             user_id,
             role="student",
-            nickname="小明" if index == 0 else name,
+            nickname="小宇" if index == 0 else name,
             grade=8,
             region=region,
             is_demo=True,
@@ -888,6 +889,7 @@ def seed_database(database: Database, anchor_date: date) -> dict[str, int]:
                 )
             )
         materials, scenarios, policies = seed_catalogs(session, anchor)
+        upgrade_legacy_curriculum_feedback(session, scenarios)
         roster = seed_identities_and_roster(session)
         session.flush()
         seed_mutable_demo(

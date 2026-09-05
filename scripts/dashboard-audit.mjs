@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { mkdir, readFile } from "node:fs/promises";
 import { chromium } from "playwright";
+import { redactAuditError, recordAuditProgress, apiJson, auditBaseUrl, authenticatePage, authenticatedSession, selectDashboardFilter } from "./audit-helpers.mjs";
 
-const baseUrl = process.env.BASE_URL ?? "http://127.0.0.1:5173";
+const baseUrl = await auditBaseUrl();
 const browser = await chromium.launch({ headless: true });
 const failures = [];
 let passed = 0;
@@ -23,6 +24,7 @@ async function run(name, role, width, checks) {
     if (message.type() === "error") errors.push(message.text());
   });
   try {
+    await authenticatePage(page, role);
     const response = await page.goto(`${baseUrl}/${role}.html`, {
       waitUntil: "networkidle",
     });
@@ -34,12 +36,14 @@ async function run(name, role, width, checks) {
     passed++;
     console.log(`PASS ${name}`);
   } catch (error) {
-    failures.push({ name, message: error.message, errors });
-    console.error(`FAIL ${name}: ${error.message}`);
+    const message = await redactAuditError(error);
+    failures.push({ name, message, errors });
+    console.error(`FAIL ${name}: ${message}`);
     await page
       .screenshot({ path: `.screenshots/${name}-failure.png`, fullPage: true })
       .catch(() => {});
   } finally {
+    await recordAuditProgress("dashboards", { passed, failed: failures.length, failures });
     await page.close();
   }
 }
@@ -74,8 +78,11 @@ async function layout(page) {
     `Main overflows by ${metrics.mainOverflow}px`,
   );
   assert.deepEqual(metrics.broken, [], "Reference artwork loads");
+  const role = new URL(page.url()).pathname.startsWith("/teacher") ? "teacher" : "government";
+  const scope = (await authenticatedSession(role)).session.scope_label;
+  const productCopy = (await page.getByRole("main").innerText()).replaceAll("離線示範", "").replaceAll("Fake Demo", "");
   assert.doesNotMatch(
-    await page.getByRole("main").innerText(),
+    scope ? productCopy.replaceAll(scope, "") : productCopy,
     /示範|模擬|RAG|Demo|預寫|本機/i,
   );
 }
@@ -117,10 +124,10 @@ await run(
     const count = async () =>
       Number((await kpi.innerText()).split("\n")[0].replaceAll(",", ""));
     const week = await count();
-    await page.getByLabel("統計期間", { exact: true }).selectOption("30d");
+    await selectDashboardFilter(page, "government", "統計期間", "30d", "period");
     const month = await count();
     assert.ok(month > week, "A longer period contains more needs");
-    await page.getByLabel("地區篩選", { exact: true }).selectOption("甲仙");
+    const filtered = await selectDashboardFilter(page, "government", "地區篩選", "甲仙", "region");
     const regional = await count();
     assert.ok(
       regional > 0 && regional < month,
@@ -135,8 +142,12 @@ await run(
       .split(/\r?\n/)
       .slice(1)
       .map((row) => row.replace(/^"|"$/g, "").split('","'));
-    assert.equal(rows.length, 6);
+    const groups = new Set(filtered.daily_aggregates.map((row) => `${row.region}:${row.topic}`));
+    assert.equal(rows.length, groups.size, "CSV has exactly the observed API region/topic groups");
     assert.ok(rows.every((row) => row[2] === "甲仙區"));
+    for (const [index, field] of [[4, "event_count"], [5, "resource_need_count"], [6, "potential_need_count"], [7, "resource_view_count"]]) {
+      assert.equal(rows.reduce((sum, row) => sum + Number(row[index]), 0), filtered.totals[field], `CSV reconciles ${field}`);
+    }
     assert.equal(
       rows.reduce((sum, row) => sum + Number(row[5]), 0),
       regional,
@@ -195,13 +206,13 @@ await run("teacher-filters-students-and-csv", "teacher", 1440, async (page) => {
       ),
     );
   const week = await questionCount();
-  await page.getByLabel("選擇統計期間", { exact: true }).selectOption("30d");
+  await selectDashboardFilter(page, "teacher", "選擇統計期間", "30d", "period");
   const month = await questionCount();
   assert.ok(month > week);
-  await page.getByLabel("選擇班級", { exact: true }).selectOption("801");
+  await selectDashboardFilter(page, "teacher", "選擇班級", "801", "class_id");
   const classCount = await questionCount();
   assert.ok(classCount > 0 && classCount < month);
-  await page.getByLabel("選擇科目", { exact: true }).selectOption("物理");
+  await selectDashboardFilter(page, "teacher", "選擇科目", "物理", "subject");
   const physicsCount = await questionCount();
   assert.ok(physicsCount > 0 && physicsCount < classCount);
   await navigate(page, "teacher", "學生管理");
@@ -324,57 +335,53 @@ await run(
   "government-aggregate-integrity",
   "government",
   1440,
-  async (page) => {
-    const results = await page.evaluate(async () => {
-      const { getGovernmentDashboard, governmentAggregates, districts } =
-        await import("/src/data/governmentDashboard.ts");
-      const failures = [];
-      for (const period of ["7d", "30d", "quarter"])
-        for (const region of ["all", ...districts]) {
-          const data = getGovernmentDashboard(period, region);
-          for (const key of ["events", "needs", "potential", "views"]) {
-            for (const rows of [data.topics, data.regions, data.trend]) {
-              if (
-                rows.reduce((sum, row) => sum + row[key], 0) !==
-                data.totals[key]
-              )
-                failures.push(`${period}/${region}/${key} totals`);
-            }
-            if (
-              data.trend.reduce((sum, row) => sum + row.previous[key], 0) !==
-              data.previousTotals[key]
-            )
-              failures.push(`${period}/${region}/${key} prior`);
+  async () => {
+    const failures = [];
+    const fields = new Set();
+    let combinations = 0;
+    const districts = ["甲仙", "六龜", "杉林", "美濃", "旗山", "內門"];
+    const countFields = ["event_count", "resource_need_count", "potential_need_count", "resource_view_count"];
+    const forbidden = new Set(["user_id", "student_id", "nickname", "student_name", "conversation_id", "message_id", "attachment_id", "family_occupation", "family_type", "economic_status", "raw_message", "profile"]);
+    function inspectKeys(value) {
+      if (!value || typeof value !== "object") return;
+      for (const [key, nested] of Object.entries(value)) {
+        assert.ok(!forbidden.has(key), `Government payload excludes ${key}`);
+        inspectKeys(nested);
+      }
+    }
+    for (const period of ["7d", "30d", "quarter"]) {
+      for (const region of ["all", ...districts]) {
+        const query = new URLSearchParams({ period, region });
+        const data = await apiJson(`/dashboard/government?${query}`, { role: "government" });
+        combinations += 1;
+        inspectKeys(data);
+        for (const key of countFields) {
+          for (const rows of [data.topics, data.regions, data.trend, data.daily_aggregates]) {
+            if (rows.reduce((sum, row) => sum + row[key], 0) !== data.totals[key]) failures.push(`${period}/${region}/${key} totals`);
           }
-          if (
-            Math.abs(
-              data.topics.reduce((sum, topic) => sum + topic.percentage, 0) -
-                100,
-            ) > 0.001
-          )
-            failures.push(`${period}/${region} percentages`);
+          for (const rows of [data.topics, data.regions, data.trend]) {
+            if (rows.reduce((sum, row) => sum + row.previous[key], 0) !== data.previous_totals[key]) failures.push(`${period}/${region}/${key} prior`);
+          }
         }
-      const fields = new Set(governmentAggregates.flatMap(Object.keys));
-      return {
-        failures,
-        fields: [...fields].sort(),
-        invalid: governmentAggregates.some(
-          (row) =>
-            row.potential > row.needs ||
-            row.views > row.needs ||
-            row.needs > row.events,
-        ),
-      };
-    });
+        const expectedShare = data.totals.resource_need_count > 0 ? 100 : 0;
+        if (Math.abs(data.topics.reduce((sum, topic) => sum + topic.percentage, 0) - expectedShare) > 0.001) failures.push(`${period}/${region} percentages`);
+        for (const row of data.daily_aggregates) {
+          Object.keys(row).forEach((key) => fields.add(key));
+          assert.ok(row.potential_need_count <= row.resource_need_count && row.resource_view_count <= row.resource_need_count && row.resource_need_count <= row.event_count, "Aggregate count bounds hold");
+          assert.ok(countFields.every((key) => Number.isInteger(row[key]) && row[key] >= 0), "Aggregate counts are nonnegative integers");
+          if (region !== "all") assert.equal(row.region, region);
+        }
+      }
+    }
+    assert.equal(combinations, 21);
     assert.deepEqual(
-      results.failures,
+      failures,
       [],
       "All 21 period/region combinations reconcile",
     );
-    assert.equal(results.invalid, false);
     assert.deepEqual(
-      results.fields,
-      ["date", "district", "events", "needs", "potential", "topic", "views"],
+      [...fields].sort(),
+      ["date", "event_count", "potential_need_count", "region", "resource_need_count", "resource_view_count", "topic"],
       "Government records contain only aggregate fields",
     );
   },

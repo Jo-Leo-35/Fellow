@@ -1,8 +1,9 @@
 import assert from "node:assert/strict";
 import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
+import { redactAuditError, recordAuditProgress, apiJson, auditBaseUrl, authenticatePage, authenticatedSession } from "./audit-helpers.mjs";
 
-const baseUrl = process.env.BASE_URL ?? "http://127.0.0.1:5173";
+const baseUrl = await auditBaseUrl();
 const mobile = { width: 390, height: 844 };
 const topics = [
   { key: "newton", title: /牛頓/ },
@@ -15,7 +16,7 @@ const topics = [
 const imageFixture = {
   name: "physics-question.png",
   mimeType: "image/png",
-  buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+j6XQAAAAASUVORK5CYII=", "base64"),
+  buffer: Buffer.from("iVBORw0KGgoAAAANSUhEUgAAAAQAAAAECAIAAAAmkwkpAAAAFElEQVR4nGMUCehhgAEmBiSAmwMAL2wA+EtIrNMAAAAASUVORK5CYII=", "base64"),
 };
 
 await mkdir(".screenshots", { recursive: true });
@@ -24,27 +25,43 @@ const failures = [];
 let passed = 0;
 
 async function run(name, path, viewport, checks) {
+  if (process.env.AUDIT_CASE && !name.includes(process.env.AUDIT_CASE)) return;
   const page = await browser.newPage({ viewport, deviceScaleFactor: 1, reducedMotion: "reduce" });
   page.setDefaultTimeout(8_000);
   page.setDefaultNavigationTimeout(10_000);
   const errors = [];
+  const agentRequests = [];
+  const agentResponses = [];
+  page.on("request", (request) => {
+    if (request.method() === "POST" && /\/api\/v1\/(agent\/)?chat$/.test(new URL(request.url()).pathname)) agentRequests.push(request);
+  });
+  page.on("response", (response) => {
+    if (response.request().method() === "POST" && /\/api\/v1\/(agent\/)?chat$/.test(new URL(response.url()).pathname)) agentResponses.push(response);
+  });
   page.on("pageerror", (error) => errors.push(error.message));
   page.on("console", (message) => {
-    if (message.type() === "error") errors.push(message.text());
+    const expectedOfflineFailure = ["unsupported-query", "free-input-and-image"].includes(name)
+      && /\/api\/v1\/agent\/chat$/.test(message.location().url)
+      && /^Failed to load resource: the server responded with a status of 503\b/.test(message.text());
+    if (message.type() === "error" && !expectedOfflineFailure) errors.push(message.text());
   });
   try {
+    await authenticatePage(page);
+    const usageBefore = name === "unsupported-query" ? await apiJson("/usage") : null;
     const response = await page.goto(`${baseUrl}${path}`, { waitUntil: "networkidle" });
     assert.ok(response?.ok(), `Page returned HTTP ${response?.status()}`);
     await page.evaluate(() => document.fonts.ready);
-    await checks(page);
+    await checks(page, { agentRequests, agentResponses, usageBefore });
     assert.deepEqual(errors, [], "Browser console and page errors");
     passed += 1;
     console.log(`PASS ${name}`);
   } catch (error) {
-    failures.push({ name, message: error instanceof Error ? error.message : String(error), errors });
-    console.error(`FAIL ${name}`);
+    const message = await redactAuditError(error);
+    failures.push({ name, message, errors });
+    console.error(`FAIL ${name}: ${message}`);
     await page.screenshot({ path: `.screenshots/learning-${name}-failure.png` }).catch(() => {});
   } finally {
+    await recordAuditProgress("learning", { passed, failed: failures.length, failures });
     await page.close();
   }
 }
@@ -60,7 +77,8 @@ async function checkTopic(page, topic) {
 }
 
 async function checkProductCopy(page) {
-  assert.doesNotMatch(await page.locator("body").innerText(), /示範|模擬|RAG|本機|預寫|生成式\s*AI/i, "Student-facing copy focuses on learning instead of implementation details");
+  const copy = (await page.locator("body").innerText()).replaceAll("離線示範", "");
+  assert.doesNotMatch(copy, /示範|模擬|RAG|本機|預寫|生成式\s*AI/i, "Only the explicit offline mode label is exempt from implementation-copy checks");
 }
 
 async function checkLayout(page) {
@@ -93,7 +111,7 @@ async function checkSources(page) {
   await citation.click();
   const dialog = page.getByRole("dialog");
   await dialog.waitFor();
-  assert.match(await dialog.innerText(), /學伴自編教材/);
+  assert.match(await dialog.innerText(), /學伴(?:自編教材| Demo 原創教材)/);
   await checkProductCopy(page);
   assert.ok((await dialog.innerText()).includes(chapter), "Citation opens its named chapter");
   assert.equal(await dialog.locator("blockquote").count(), 1, "Citation opens one exact source passage");
@@ -240,11 +258,14 @@ try {
     await page.locator('input[type="file"]').setInputFiles(imageFixture);
     await page.getByRole("button", { name: "移除已選圖片", exact: true }).waitFor();
     for (const key of ["thermodynamics", "newton"]) {
+      const previousConversation = new URL(page.url()).searchParams.get("conversation");
       await page.getByRole("navigation", { name: "物理化學主題" }).locator(`[href="/learning-chat.html?topic=${key}"]`).click();
-      await page.waitForURL((url) => url.searchParams.get("topic") === key);
+      await page.waitForURL((url) => url.searchParams.has("conversation") && url.searchParams.get("conversation") !== previousConversation);
       await checkTopic(page, topics.find((topic) => topic.key === key));
       assert.equal(await page.getByRole("textbox", { name: "輸入問題", exact: true }).inputValue(), "", "Switch clears the draft");
-      assert.equal((await page.getByRole("log", { name: "後續問答" }).innerText()).trim(), "", "Switch clears prior messages");
+      assert.equal(await page.getByRole("log", { name: "後續問答" }).getByRole("article", { name: "學伴回覆" }).count(), 0, "Switch clears earlier follow-ups");
+      const newConversation = await apiJson(`/conversations/${encodeURIComponent(new URL(page.url()).searchParams.get("conversation"))}`);
+      assert.equal(newConversation.messages.length, 2, "New topic stores only its own initial question and answer");
       assert.equal(await page.getByRole("button", { name: "移除已選圖片", exact: true }).count(), 0, "Switch clears the attachment");
       assert.equal(await page.getByRole("region", { name: "理解練習" }).count(), 0, "Switch closes the practice");
       await checkLayout(page);
@@ -254,15 +275,20 @@ try {
     assert.equal(await page.getByRole("region", { name: "理解練習" }).getByRole("status").count(), 0);
   });
 
+  const identity = (await authenticatedSession()).session;
+  const history = await apiJson(`/conversations?user_id=${encodeURIComponent(identity.user_id)}`);
+  const chemistryHistory = history.items.find((item) => item.mode === "learning" && /化學.*平衡/.test(item.title));
+  assert.ok(chemistryHistory, "Persisted chemistry history exists after the real topic flow");
   const routes = [
     { name: "default", query: "", topic: "newton" },
     { name: "invalid-topic", query: "?topic=__proto__", topic: "newton" },
     { name: "newton-query", query: `?q=${encodeURIComponent("牛頓力學的解釋")}`, topic: "newton" },
     { name: "thermodynamics-query", query: `?q=${encodeURIComponent("熱力學的解釋")}`, topic: "thermodynamics" },
-    { name: "chemistry-history", query: `?history=${encodeURIComponent("化學平衡為什麼還在反應？")}`, topic: "equilibrium", specificQuestion: true },
+    { name: "chemistry-history", query: `?conversation=${encodeURIComponent(chemistryHistory.conversation_id)}`, topic: "equilibrium", specificQuestion: true },
   ];
   for (const route of routes) {
-    await run(route.name, `/learning-chat.html${route.query}`, mobile, async (page) => {
+    const historyUsage = route.specificQuestion ? await apiJson("/usage") : null;
+    await run(route.name, `/learning-chat.html${route.query}`, mobile, async (page, { agentRequests }) => {
       if (route.specificQuestion) {
         const selected = page.getByRole("navigation", { name: "物理化學主題" }).locator(`[href="/learning-chat.html?topic=${route.topic}"]`);
         assert.equal(await selected.getAttribute("aria-current"), "page", "History selects the relevant topic");
@@ -270,6 +296,8 @@ try {
         await answer.waitFor();
         assert.match(await answer.innerText(), /平衡.*反應|反應.*平衡/s);
         assert.ok(await answer.getByRole("button", { name: /^閱讀引用/ }).count() > 0, "Specific history question gets a grounded answer");
+        assert.equal(agentRequests.length, 0, "History reopening only reads the saved conversation");
+        assert.deepEqual(await apiJson("/usage"), historyUsage, "History reopening preserves all usage counters");
       } else {
         await checkTopic(page, topics.find((topic) => topic.key === route.topic));
       }
@@ -277,12 +305,14 @@ try {
     });
   }
 
-  await run("unsupported-query", `/learning-chat.html?q=${encodeURIComponent("火星上的生命從哪裡來？")}`, mobile, async (page) => {
-    const reply = page.getByRole("article", { name: "學伴回覆" });
-    await reply.waitFor();
-    assert.match(await reply.innerText(), /沒有.*教材|找不到.*教材|尚未.*涵蓋|超出.*教材|未找到/s);
-    assert.equal(await reply.getByRole("button", { name: /閱讀引用|段教材依據/ }).count(), 0, "Unsupported question has no fabricated citations");
+  await run("unsupported-query", `/learning-chat.html?q=${encodeURIComponent("火星上的生命從哪裡來？")}`, mobile, async (page, { agentResponses, usageBefore }) => {
+    await page.getByRole("alert").filter({ hasText: /離線示範/ }).waitFor();
+    assert.equal(agentResponses.at(-1)?.status(), 503);
+    assert.equal((await agentResponses.at(-1).json()).error.code, "OFFLINE_DEMO_UNAVAILABLE");
+    assert.equal(await page.getByRole("article", { name: "學伴回覆" }).count(), 0, "An unsupported query has no fake successful answer");
+    assert.equal(await page.getByRole("button", { name: /^閱讀引用/ }).count(), 0, "Unsupported question has no fabricated citations");
     assert.equal(await page.getByRole("heading", { level: 1 }).count(), 0, "An unsupported query does not render an unrelated topic answer");
+    assert.deepEqual(await apiJson("/usage"), usageBefore, "Unsupported initial query is not charged");
     await checkProductCopy(page);
     await checkLayout(page);
   });
@@ -292,33 +322,40 @@ try {
     const input = page.getByRole("textbox", { name: "輸入問題", exact: true });
     const send = page.getByRole("button", { name: "送出問題", exact: true });
     const log = page.getByRole("log", { name: "後續問答" });
+    const initialReplies = await log.getByRole("article", { name: "學伴回覆" }).count();
     await send.click();
     await page.getByText("請先輸入問題，或選擇題目圖片。", { exact: true }).waitFor();
     await input.fill("火星上的生命從哪裡來？");
+    const beforeUnsupported = await apiJson("/usage");
+    const unsupportedResponse = page.waitForResponse((response) => new URL(response.url()).pathname === "/api/v1/agent/chat" && response.request().method() === "POST");
     await input.press("Enter");
-    const unsupported = log.getByRole("article", { name: "學伴回覆" }).first();
-    await unsupported.waitFor();
-    assert.match(await unsupported.innerText(), /沒有.*教材|找不到.*教材|尚未.*涵蓋|超出.*教材|未找到/s);
-    assert.equal(await unsupported.getByRole("button").count(), 0);
+    assert.equal((await unsupportedResponse).status(), 503);
+    await page.getByRole("alert").filter({ hasText: /離線示範/ }).waitFor();
+    assert.equal(await log.getByRole("article", { name: "學伴回覆" }).count(), initialReplies, "An unsupported follow-up is shown as an error, without an invented response or citations");
+    assert.deepEqual(await apiJson("/usage"), beforeUnsupported);
     await checkProductCopy(page);
-    assert.equal(await input.inputValue(), "");
-    await input.fill("熱力學的解釋");
+    assert.equal(await input.inputValue(), "火星上的生命從哪裡來？", "Failed input remains available to edit or retry");
+    await input.fill("請解釋牛頓第二定律");
     await send.click();
-    const supported = log.getByRole("article", { name: "學伴回覆" }).nth(1);
+    const supported = log.getByRole("article", { name: "學伴回覆" }).nth(initialReplies);
     await supported.waitFor();
-    assert.match(await supported.innerText(), /熱力學|內能/);
+    assert.match(await supported.innerText(), /牛頓|合力|加速度/);
     assert.ok(await supported.getByRole("button", { name: /^閱讀引用/ }).count() > 0);
 
     await page.locator('input[type="file"]').setInputFiles(imageFixture);
     await page.getByRole("button", { name: "移除已選圖片", exact: true }).waitFor();
     await checkLayout(page);
+    const beforeImage = await apiJson("/usage");
+    const repliesBeforeImage = await log.getByRole("article", { name: "學伴回覆" }).count();
+    const imageResponse = page.waitForResponse((response) => new URL(response.url()).pathname === "/api/v1/agent/chat" && response.request().method() === "POST");
     await send.click();
-    const imageReply = log.getByRole("article", { name: "學伴回覆" }).nth(2);
-    await imageReply.waitFor();
-    assert.match(await imageReply.innerText(), /請把圖片中的問題打出來/);
-    assert.match(await imageReply.innerText(), /目前無法讀取圖片中的文字/);
-    assert.equal(await imageReply.getByRole("button").count(), 0, "Image-only question does not invent a source or OCR result");
-    assert.equal(await page.getByRole("button", { name: "移除已選圖片", exact: true }).count(), 0);
+    assert.equal((await imageResponse).status(), 503);
+    const imageError = page.getByRole("alert").filter({ hasText: /離線示範/ });
+    await imageError.waitFor();
+    assert.match(await imageError.innerText(), /圖片|文字/);
+    assert.equal(await log.getByRole("article", { name: "學伴回覆" }).count(), repliesBeforeImage, "Image-only question does not invent an answer, source, or OCR result");
+    assert.deepEqual(await apiJson("/usage"), beforeImage);
+    assert.equal(await page.getByRole("button", { name: "移除已選圖片", exact: true }).count(), 1, "Failed image-only request keeps its selected file for correction or retry");
     await checkProductCopy(page);
     await checkLayout(page);
   });

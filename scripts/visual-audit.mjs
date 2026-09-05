@@ -1,7 +1,8 @@
 import { mkdir } from "node:fs/promises";
 import { chromium } from "playwright";
+import { auditBaseUrl, authenticatePage } from "./audit-helpers.mjs";
 
-const baseUrl = process.env.BASE_URL ?? "http://127.0.0.1:5173";
+const baseUrl = await auditBaseUrl();
 const cases = [
   { name: "home", path: "/index.html", width: 390, height: 844 },
   { name: "learning", path: "/learning-chat.html", width: 390, height: 844 },
@@ -26,6 +27,7 @@ for (const item of cases) {
   page.on("console", (message) => {
     if (message.type() === "error") errors.push(message.text());
   });
+  await authenticatePage(page, item.name === "teacher" ? "teacher" : item.name === "government" ? "government" : "student");
   const response = await page.goto(`${baseUrl}${item.path}`, { waitUntil: "networkidle" });
   await page.evaluate(() => document.fonts.ready);
   await page.waitForTimeout(1600);

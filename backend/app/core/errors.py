@@ -35,7 +35,7 @@ def _request_id(request: Request) -> str:
     return getattr(request.state, "request_id", uuid.uuid4().hex)
 
 
-def _error_response(
+def error_response(
     request: Request,
     *,
     status_code: int,
@@ -65,7 +65,7 @@ def _error_response(
 def install_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(AppError)
     async def app_error_handler(request: Request, exc: AppError) -> JSONResponse:
-        return _error_response(
+        return error_response(
             request,
             status_code=exc.status_code,
             code=exc.code,
@@ -91,9 +91,13 @@ def install_exception_handlers(app: FastAPI) -> None:
             ).model_dump(mode="json")
             for error in exc.errors()
         ]
-        return _error_response(
+        json_syntax_error = any(
+            error.get("type") in {"json_invalid", "value_error.jsondecode"}
+            for error in exc.errors()
+        )
+        return error_response(
             request,
-            status_code=422,
+            status_code=400 if json_syntax_error else 422,
             code="VALIDATION_ERROR",
             message="請求資料格式不正確。",
             details={"fields": fields},
@@ -108,7 +112,7 @@ def install_exception_handlers(app: FastAPI) -> None:
             code = "UNAUTHORIZED"
         elif exc.status_code == 404:
             code = "RESOURCE_NOT_FOUND"
-        return _error_response(
+        return error_response(
             request,
             status_code=exc.status_code,
             code=code,
@@ -121,7 +125,7 @@ def install_exception_handlers(app: FastAPI) -> None:
     async def unexpected_error_handler(
         request: Request, _exc: Exception
     ) -> JSONResponse:
-        return _error_response(
+        return error_response(
             request,
             status_code=500,
             code="INTERNAL_ERROR",

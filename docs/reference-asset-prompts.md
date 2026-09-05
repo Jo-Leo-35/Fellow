@@ -4,7 +4,7 @@
 
 ## teacher-avatar
 
-儲存位置：`public/assets/reference-teacher-avatar.png`
+儲存位置：`frontend/public/assets/reference-teacher-avatar.png`
 
 最終背景清理提示詞：
 
@@ -14,7 +14,7 @@ Use case: background-extraction. Edit target: the attached extracted artwork. Ch
 
 ## region-map
 
-儲存位置：`public/assets/reference-region-map.png`
+儲存位置：`frontend/public/assets/reference-region-map.png`
 
 最終背景清理提示詞：
 
@@ -24,12 +24,11 @@ Use case: background-extraction. Edit target: the attached extracted artwork. Ch
 
 ## insight-bulb
 
-儲存位置：`public/assets/reference-insight-bulb.png`
+儲存位置：`frontend/public/assets/reference-insight-bulb.png`
 
 最終背景清理提示詞：
 
 ```text
 Use case: background-extraction. Edit target: the attached extracted artwork. Change only the checkerboard background to a perfectly flat solid #ff00ff chroma-key background. Preserve the yellow light bulb and short solid yellow rays, without the surrounding diffuse glow exactly: same shape, identity, colors, pose, texture and internal details. Remove every trace of white/gray checkerboard outside the subject. Tight square framing with 4% solid magenta padding around the subject. No fake transparency grid. No shadows or gradients in the background, no text, no new elements. The magenta is for local background removal; do not use magenta anywhere in the subject.
 ```
-
 

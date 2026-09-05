@@ -10,6 +10,7 @@ test-results
 *.tsbuildinfo
 vite.config.js
 vite.config.d.ts
+frontend/public/評審請看這/
 
 # Python environments and generated files
 .venv/
@@ -18,9 +19,21 @@ __pycache__/
 *.py[cod]
 .pytest_cache/
 .ruff_cache/
-
+docs/deliverables
+FutureAI/docs/tasks
 # Backend runtime data
 backend/data/*.db
 backend/data/*.db-*
 backend/data/uploads/*
 !backend/data/uploads/.gitkeep
+
+# Local implementation logs and other persistent runtime locations
+.codex-runs/
+backend/chroma/
+backend/data/chroma/*
+!backend/data/chroma/.gitignore
+*.sqlite
+*.sqlite3
+*.sqlite3-*
+runtime/
+backups/

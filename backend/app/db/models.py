@@ -637,6 +637,7 @@ class QuotaReservation(Base):
     id: Mapped[str] = mapped_column(
         String(128), primary_key=True, default=lambda: new_id("reservation")
     )
+    attempt_id: Mapped[str] = mapped_column(String(128), nullable=False)
     ledger_id: Mapped[str] = mapped_column(
         ForeignKey("quota_ledgers.id", ondelete="CASCADE"), nullable=False, index=True
     )

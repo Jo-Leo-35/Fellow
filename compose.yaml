@@ -1,0 +1,3 @@
+# Compatibility entry point. Deployment configuration lives in deploy/.
+include:
+  - path: deploy/compose.yaml
