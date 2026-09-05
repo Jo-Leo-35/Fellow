@@ -22,6 +22,7 @@ import { useRef, type ReactNode } from "react";
 import { Link as RouterLink } from "react-router-dom";
 import { useAuth } from "@/api/runtime";
 import { Brand } from "@/components/ui/Brand";
+import { RoleSwitcher } from "@/components/layout/RoleSwitcher";
 
 export interface DashboardNavItem {
   label: string;
@@ -42,12 +43,6 @@ export interface DashboardShellProps {
   ownerImage?: string;
 }
 
-const roleLinks = [
-  { label: "學生端", href: "/index.html", edition: "學生版" },
-  { label: "教師端", href: "/teacher.html", edition: "教師版" },
-  { label: "政府端", href: "/government.html", edition: "政府版" },
-];
-
 export function DashboardShell({
   edition,
   title,
@@ -61,7 +56,7 @@ export function DashboardShell({
   actions,
   ownerImage,
 }: DashboardShellProps) {
-  const {identity:sessionIdentity,session,logout}=useAuth();
+  const {identity:sessionIdentity}=useAuth();
   ownerName=sessionIdentity.displayName; ownerDetail=sessionIdentity.scopeLabel??"";
   const menu = useDisclosure();
   const menuRef = useRef<HTMLButtonElement>(null);
@@ -133,31 +128,6 @@ export function DashboardShell({
       </Box>
     </HStack>
   );
-  const roles = (
-    <HStack as="nav" aria-label="切換使用介面" spacing="4px" flexWrap="wrap">
-      {session.runtimeMode === "live" && <Button size="xs" variant="ghost" onClick={logout}>登出</Button>}
-      {roleLinks.map((role) => (
-        <Button
-          key={role.href}
-          as={RouterLink}
-          to={role.href}
-          onClick={()=>{if(role.edition!==edition)logout();}}
-          size="xs"
-          h="29px"
-          px="9px"
-          variant="ghost"
-          aria-current={role.edition === edition ? "page" : undefined}
-          bg={role.edition === edition ? "brand.50" : "transparent"}
-          color={role.edition === edition ? "brand.700" : "#688293"}
-          fontWeight={role.edition === edition ? 700 : 500}
-          _hover={{ bg: "brand.50", color: "brand.700" }}
-        >
-          {role.label}
-        </Button>
-      ))}
-    </HStack>
-  );
-
   return (
     <Flex minH="100dvh" maxW="100vw" bg="#F5FAFC">
       <Flex
@@ -239,7 +209,7 @@ export function DashboardShell({
               {edition}工作台
             </Text>
           </HStack>
-          {roles}
+          <RoleSwitcher showLogout />
         </Flex>
         <Box
           as="main"

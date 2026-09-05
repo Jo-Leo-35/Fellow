@@ -14,6 +14,7 @@ import type { ReactNode } from "react";
 import type { StudentNavKey } from "@/types";
 import { useAlerts, useAuth, useUsage } from "@/api/runtime";
 import { Brand } from "@/components/ui/Brand";
+import { RoleSwitcher } from "@/components/layout/RoleSwitcher";
 
 const navItems = [
   { key: "chat" as const, label: "聊天", icon: MessageCircleMore, href: "/index.html" },
@@ -43,13 +44,27 @@ export function StudentShell({
 }: StudentShellProps) {
   const {identity,session,logout}=useAuth();const alerts=useAlerts();const usage=useUsage();
   return (
-    <Flex minH="100dvh" justify="center" align="stretch" bg={{ base: "white", md: "#EDF5F7" }}>
+    <Flex minH="100dvh" direction="column" align="stretch" bg={{ base: "white", md: "#EDF5F7" }}>
+      <Flex
+        display={{ base: "none", md: "flex" }}
+        h="58px"
+        flexShrink={0}
+        align="center"
+        justify="flex-end"
+        px={{ md: "24px", xl: "32px" }}
+        bg="white"
+        borderBottom="1px solid #E4EEF2"
+      >
+        <RoleSwitcher />
+      </Flex>
       <Flex
         direction="column"
+        alignSelf="center"
+        flexShrink={0}
         position="relative"
         w="full"
         maxW={{ base: "none", md: "430px" }}
-        h={{ base: "100dvh", md: "min(920px, calc(100dvh - 48px))" }}
+        h={{ base: "100dvh", md: "min(920px, calc(100dvh - 106px))" }}
         maxH={{ base: "100dvh", md: "920px" }}
         my={{ base: 0, md: "24px" }}
         overflow="hidden"
