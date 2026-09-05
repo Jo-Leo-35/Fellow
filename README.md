@@ -62,7 +62,7 @@ flowchart TD
     RAG --> Chroma[(Chroma 向量索引)]
     Catalog[原創教材與政策示範 JSON] --> Chroma
     Catalog --> DB
-    Agent --> Offline[目前：離線預設回答]
+    Agent --> Offline
     Agent -. live 模式待設定與驗證 .-> Provider[OpenAI 相容 API：文字生成與 Embeddings]
     Provider -. 線上向量檢索 .-> Chroma
 ```
