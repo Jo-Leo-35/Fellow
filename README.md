@@ -1,4 +1,8 @@
-# 學伴 Frontend Prototype
+# Fellow
+
+Fellow is an AI agent for rural students that provides learning support, connects families with public resources, and transforms anonymized interactions into actionable policy insights.
+
+## 學伴 Frontend Prototype
 
 依 `frontend-sdd.md` 與參考設計稿完成的 React + TypeScript + Vite 多頁原型。UI 使用 Chakra UI、Lucide 與 Apache ECharts；資料目前為 demo data，HTTP 邊界保留在 `src/api/client.ts`，方便後端 agent 接線。
 

@@ -64,3 +64,4 @@
 - 1.2 初稿 typecheck/build 與自測通過。獨立延遲 HTTP body 驗收發現 timeout/abort 未涵蓋 body，及共用 submission 任一 consumer 取消會影響其他 consumer；已回原 1.2 session 修正，完成前不凍結交接。
 - 1.2 已完成修正並凍結：最終 typecheck/build、真實 HTTP 延遲 JSON/error/binary body、個別 consumer 取消隔離、單次 transport、cache/logout 驗收均通過。紀錄確認只有原 session 的兩個 turn；15 個修改檔案全部在允許範圍。頁面接線仍屬 3.2。
 - 2.1 首輪 health/docs/seed 重跑等 smoke 通過；獨立驗收發現 consent 接受數字 1/1.0 及 seed Insight/message owner/topic/date 不一致，正由原 session 修正。1.2 依賴已滿足，2.1 驗收完成後 Task 2 owner 直接接續 2.2。
+- 時間界線（已加入 2.2/3.1/4.1 prompt）：固定 Demo dataset anchor 僅供示範學習/Insight/dashboard 資料；session/suggestion 到期、daily quota/reset_at、idempotency TTL 用真實 UTC，rate/timeout 用真實時間或 monotonic clock，不因 offline_demo 凍結安全計時。
