@@ -133,7 +133,7 @@ Python packages live in `.venv/`; runtime data and logs live in `runtime/local-d
 
 ## Project Demo
 
-- Judge's guide: [Start here](docs/README.md), with HTML walkthroughs and PDFs in Traditional Chinese. PDFs can be viewed directly in the repository.
+- [Technical documentation for judges](docs/README.md): architecture, frontend and backend specifications, API contracts, deployment, and verification records, with supplementary HTML/PDF feature guides in Traditional Chinese.
 
 | Feature guide | Document |
 | --- | --- |

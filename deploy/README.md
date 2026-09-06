@@ -7,6 +7,10 @@
 | `Dockerfile.backend` | Python 後端映像 |
 | `nginx.conf` | 靜態入口與 API 代理 |
 | `backend-entrypoint.py` | 容器內 seed、索引與 API 啟動 |
+| `runpod.py`、`RUNPOD.md` | RunPod 單埠啟動入口及壓縮包部署操作 |
+
+上傳 RunPod 請參考 [RunPod 部署](RUNPOD.md)，使用 `scripts/package-runpod.py`
+產生包含已建置前端的壓縮包。
 
 根目錄 `compose.yaml` 只作相容入口，引用此目錄設定。因此原有的 `docker compose ...` 指令仍從專案根目錄執行。預設設定檔也仍位於根目錄 `.env`；使用外部設定檔時，`FUTUREAI_ENV_FILE` 請填絕對路徑。
 

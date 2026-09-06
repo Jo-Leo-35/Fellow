@@ -14,6 +14,7 @@ frontend/public/評審請看這/
 
 # Python environments and generated files
 .venv/
+.venv-runpod/
 venv/
 __pycache__/
 *.py[cod]

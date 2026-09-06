@@ -6,6 +6,7 @@
 | 分類 | 腳本 | 用途 |
 | --- | --- | --- |
 | 本機部署 | `start.sh`、`stop.sh`、`local-demo.py`、`create-demo-env.py` | 私有設定檔建立、啟停及狀態檢查 |
+| RunPod 打包 | `package-runpod.py` | 建置前端，將目前工作目錄的程式碼與前端成品打包為 `dist/FutureAI-runpod.tar.gz`，另附 SHA-256；排除私有設定、金鑰及執行資料 |
 | 文件發布 | `sync-judge-docs.mjs` | 將 `docs/judges/` 原始文件同步到前端生成目錄 |
 | 文件製作 | `generate-judge-guides.mjs` | 產生五份教學與評審 HTML，輸出至 `docs/judges/` |
 | 簡報製作 | `generate-hackathon-demo-deck.mjs` | 產生投影片與旁白，輸出至 `docs/deliverables/` |
