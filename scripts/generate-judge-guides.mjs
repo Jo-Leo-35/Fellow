@@ -369,17 +369,44 @@ const demoRoutes = [
 ];
 const finalHtml = `<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Final Demo｜Fellow 學伴</title><link rel="stylesheet" href="assets/guide.css"></head><body><div class="demo-shell"><header class="demo-top"><img src="assets/logo.svg" alt=""><div><strong>Fellow｜Final Demo</strong><p>從學生的一次提問，到教師行動與政府匿名洞察</p></div><a href="index.html">回到評審入口</a></header><main class="demo-main"><aside class="demo-rail"><span class="eyebrow">LIVE PRODUCT</span><h1>完整成果</h1><p>請依序點選五段旅程。右側會直接載入實際產品頁面；需要完整操作空間時可另開新分頁。</p><div class="demo-routes">${demoRoutes.map(([no,title,note,route,guide],index)=>`<button type="button" data-demo-route="${route}" data-guide="${guide}" ${index===0?'class="active"':''}><b>${no}</b><span>${title}</span><small>${note}</small></button>`).join("")}</div><div class="demo-controls"><button type="button" data-auto-tour>自動導覽：關閉</button><a data-open-demo href="${demoRoutes[0][3]}" target="_blank" rel="noopener">另開目前 Demo ↗</a></div></aside><section class="demo-stage"><div class="stage-head"><span>目前段落</span><strong data-stage-title>${demoRoutes[0][1]}</strong><a data-guide-link href="${demoRoutes[0][4]}">回到詳細教學</a></div><div class="frame-wrap"><iframe data-demo-frame title="Fellow 實際產品 Demo" src="${demoRoutes[0][3]}"></iframe><div class="frame-hint">此為評審 Demo 專用畫面，可直接切換角色與功能。</div></div></section></main></div><script>(${function finalDemo(){const buttons=[...document.querySelectorAll('[data-demo-route]')];const frame=document.querySelector('[data-demo-frame]');const title=document.querySelector('[data-stage-title]');const open=document.querySelector('[data-open-demo]');const guide=document.querySelector('[data-guide-link]');let index=0,timer=null;function activate(i){index=i;const button=buttons[i];buttons.forEach(x=>x.classList.toggle('active',x===button));frame.src=button.dataset.demoRoute;title.textContent=button.querySelector('span').textContent;open.href=button.dataset.demoRoute;guide.href=button.dataset.guide;}buttons.forEach((button,i)=>button.addEventListener('click',()=>{activate(i);if(timer){clearInterval(timer);timer=null;document.querySelector('[data-auto-tour]').textContent='自動導覽：關閉';}}));document.querySelector('[data-auto-tour]').addEventListener('click',event=>{if(timer){clearInterval(timer);timer=null;event.currentTarget.textContent='自動導覽：關閉';return;}event.currentTarget.textContent='自動導覽：每 12 秒切換';timer=setInterval(()=>activate((index+1)%buttons.length),12000);});}.toString()})()</script></body></html>`;
 
-const readme = `# 評審請看這\n\n這個資料夾是 Fellow／學伴的評審 Demo 專用入口。\n\n## Demo 專用入口\n\n- [評審導覽](index.html)\n- [兩分鐘投影片](Fellow-兩分鐘-Demo-投影片.html)\n- [Final Demo](final-demo.html)\n\n## 五份文件\n\n${features.map((f) => `- ${f.no} ${f.title}：[HTML](${f.file}.html)｜[PDF](${f.file}.pdf)`).join("\n")}\n\n## 建議體驗順序\n\n1. 從 index.html 閱讀願景與五個功能。\n2. 逐份打開 HTML 教學，完成頁內互動與評審任務。\n3. 需要離線閱讀時開啟對應 PDF；每份 7 頁。\n4. 最後進入 final-demo.html，在同一畫面切換實際產品頁面。\n\n## 目前系統口徑\n\n評審 Demo 採專用示範模型與原創內容；前後端 API、權限、持久化與三角色資料流程皆已實際串接。政策與教材是原創示範資料；資源推薦不是正式資格核定；政府端只讀匿名 Insight 聚合，不讀取原始學生對話。\n`;
-const readmeWithTwoMinuteDeck = readme.replace(
-  '## 五份文件',
-  '## 兩分鐘影片投影片\n\n- [Fellow-兩分鐘-Demo-投影片.html](Fellow-兩分鐘-Demo-投影片.html)：16:9、8 幕、總長 120 秒，含自動播放與逐頁旁白稿。\n\n## 五份文件',
-);
+const readme = `# 評審技術文件
+
+本頁彙整 Fellow／學伴的系統架構、前後端規格、API 契約、部署方式與驗證紀錄，供評審查閱技術實作與驗收範圍。
+
+## 技術文件導覽
+
+| 主題 | 文件 | 閱讀重點 |
+| --- | --- | --- |
+| 系統架構 | [架構總覽](../../README.md#系統架構)／[全端設計規格](../specs/hackathon-fullstack-sdd.md) | 元件分工、技術選型與三角色資料流程 |
+| 前端實作 | [前端目錄說明](../../frontend/README.md)／[前端設計規格](../specs/frontend-sdd.md) | 頁面、元件、API client 與建置方式 |
+| 後端實作 | [後端目錄說明](../../backend/README.md)／[後端設計規格](../specs/backend-sdd.md) | FastAPI 服務、模型介面、檢索與資料模型 |
+| API 與權限 | [API 契約](../api-alignment.md) | 請求與回應格式、session、角色授權及資料邊界 |
+| 安裝與部署 | [安裝與執行](../../README.md#安裝與執行)／[部署設定](../../deploy/README.md) | 本機啟動、容器設定與 API 代理 |
+| 維運與排查 | [操作手冊](../demo-runbook.md) | 環境設定、資料保存、驗證步驟與故障排查 |
+| 測試與驗收 | [整合驗證紀錄](../integration-report.md) | 測試環境、當時驗收結果、重跑命令與未驗證項目 |
+
+## 建議閱讀順序
+
+1. 先讀架構總覽，了解前後端分工與學生、教師、政府的資料流程。
+2. 依審查主題查看前後端規格與 API 契約。
+3. 對照安裝步驟、操作手冊與整合驗證紀錄，確認重現方式及驗收範圍。
+
+設計規格與 API 契約記錄設計及對接約定；目前完成範圍與限制以 [根目錄 README](../../README.md#限制與未來工作) 為準，測試結果請依整合驗證紀錄的日期與環境判讀。
+
+## 功能說明補充
+
+以下五份 HTML／PDF 說明功能操作與資料邊界，可搭配技術文件閱讀；PDF 可直接在 GitHub 預覽或下載。
+
+${features.map((f) => `- ${f.no} ${f.title}：[HTML](${f.file}.html)｜[PDF](${f.file}.pdf)`).join("\n")}
+`;
 
 fs.writeFileSync(path.join(assetsDir, "guide.css"), css, "utf8");
 fs.writeFileSync(path.join(assetsDir, "guide.js"), js, "utf8");
 features.forEach((feature, index) => fs.writeFileSync(path.join(judgeDir, `${feature.file}.html`), renderFeature(feature, index), "utf8"));
 fs.writeFileSync(path.join(judgeDir, "index.html"), portalHtmlWithTwoMinuteDeck, "utf8");
 fs.writeFileSync(path.join(judgeDir, "final-demo.html"), finalHtml, "utf8");
-fs.writeFileSync(path.join(judgeDir, "README.md"), readmeWithTwoMinuteDeck, "utf8");
+// README is an authored product story; regenerating guides must preserve it.
+const readmePath = path.join(judgeDir, "README.md");
+if (!fs.existsSync(readmePath)) fs.writeFileSync(readmePath, readme, "utf8");
 
 console.log(JSON.stringify({ judgeDir, htmlGuides: features.map((feature) => `${feature.file}.html`) }, null, 2));
