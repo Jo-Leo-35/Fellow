@@ -9,8 +9,8 @@
 </p>
 
 <p align="center">
-  讓每一次提問，都成為獲得學習支持與生活協助的起點。<br />
-  Every question opens a door to learning and everyday support.
+  讓每一次提問，都成為獲得學習支持與家庭生活協助的起點，縮短政府與個人的距離<br />
+  Every question opens a door to learning support and everyday help for families, bringing people and government closer together.
 </p>
 
 ## 問題與目標
