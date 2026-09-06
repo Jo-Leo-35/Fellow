@@ -2,7 +2,7 @@
 
 [繁體中文](README.md) | **English**
 
-For judges: [Judge reference guide (Traditional Chinese)](評審參考文件.md) · [Documentation index](docs/README.md)
+For judges: [Judge reference guide (Traditional Chinese)](評審參考文件.md) · [Complete judge guide (Traditional Chinese)](docs/README.md)
 
 <p align="center">
   <img src="frontend/public/assets/mascot-home-v2.png" alt="Fellow mascot: a smiling learning companion robot with a sprout / Fellow 學伴吉祥物：頭頂嫩芽、微笑的學習陪伴機器人" width="280" />
@@ -133,7 +133,7 @@ Python packages live in `.venv/`; runtime data and logs live in `runtime/local-d
 
 ## Project Demo
 
-- Judge's guide: [Start here](docs/judges/README.md), with HTML walkthroughs and PDFs in Traditional Chinese. PDFs can be viewed directly in the repository.
+- Judge's guide: [Start here](docs/README.md), with HTML walkthroughs and PDFs in Traditional Chinese. PDFs can be viewed directly in the repository.
 
 | Feature guide | Document |
 | --- | --- |

@@ -2,7 +2,7 @@
 
 **繁體中文** | [English](README.en.md)
 
-評審入口：[評審參考文件](評審參考文件.md) · [完整文件索引](docs/README.md)
+評審入口：[評審參考文件](評審參考文件.md) · [完整評審 README](docs/README.md)
 
 <p align="center">
   <img src="frontend/public/assets/mascot-home-v2.png" alt="Fellow 學伴吉祥物：頭頂嫩芽、微笑的學習陪伴機器人 / Fellow mascot: a smiling learning companion robot with a sprout" width="280" />
@@ -147,7 +147,7 @@ PYTHONPATH=backend ANONYMIZED_TELEMETRY=False .venv/bin/python -m unittest disco
 Python 套件存於 `.venv/`，執行資料與 log 存於 `runtime/local-demo/`。這些目錄與私有 `.env` 均已列入 `.gitignore`。重新啟動會沿用本機資料；新環境則建立虛構 Demo 資料。完整瀏覽器驗收與可選的 Docker Compose 部署方式，請見 [操作手冊](docs/demo-runbook.md) 與 [整合驗證紀錄](docs/integration-report.md)。
 
 ## 作品展示
-- 評審導覽：[評審請看這](docs/judges/README.md)，含 HTML 操作導覽與 PDF；PDF 可直接在儲存庫檢視。
+- 評審導覽：[評審請看這](docs/README.md)，含 HTML 操作導覽與 PDF；PDF 可直接在儲存庫檢視。
 | 功能說明 | 文件 |
 | --- | --- |
 | 學習問答與互動動畫 | [PDF](docs/judges/01-學習問答與互動動畫.pdf) |
