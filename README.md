@@ -2,7 +2,7 @@
 
 **繁體中文** | [English](README.en.md)
 
-評審入口：[評審參考文件](評審參考文件.md) · [完整評審 README](docs/README.md)
+評審入口：[評審參考文件：完整產品介紹與功能導覽](docs/README.md)
 
 <p align="center">
   <img src="frontend/public/assets/mascot-home-v2.png" alt="Fellow 學伴吉祥物：頭頂嫩芽、微笑的學習陪伴機器人 / Fellow mascot: a smiling learning companion robot with a sprout" width="280" />
@@ -35,7 +35,7 @@ Fellow 學伴以學生為主要使用者，結合學習問答、互動教學動�
 
 ```text
 Fellow/
-├── 評審參考文件.md         # 評審閱讀與體驗入口
+├── 評審參考文件.md         # 連結至 docs/README.md 的評審文件入口
 ├── frontend/              # 前端原始碼、HTML、素材與建置設定
 ├── backend/               # API、服務、檢索、資料與後端測試
 ├── deploy/                # Dockerfile、Compose、nginx 與容器啟動
@@ -148,7 +148,7 @@ Python 套件存於 `.venv/`，執行資料與 log 存於 `runtime/local-demo/`�
 
 ## 作品展示
 
-- [評審技術文件](docs/README.md)：系統架構、前後端規格、API、部署與驗證紀錄，另附功能說明 HTML／PDF。
+- [評審參考文件](docs/README.md)：完整產品故事、圖解、氫鍵教學案例與五大功能操作流程，並附技術文件及 HTML／PDF 導覽。
 
 | 功能說明 | 文件 |
 | --- | --- |

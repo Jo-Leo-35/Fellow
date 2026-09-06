@@ -2,7 +2,7 @@
 
 [繁體中文](README.md) | **English**
 
-For judges: [Judge reference guide (Traditional Chinese)](評審參考文件.md) · [Complete documentation index (Traditional Chinese)](https://github.com/Jo-Leo-35/Fellow/blob/main/docs/README.md)
+For judges: [Judge reference guide: complete product introduction and feature walkthroughs (Traditional Chinese)](docs/README.md)
 
 <p align="center">
   <img src="frontend/public/assets/mascot-home-v2.png" alt="Fellow mascot: a smiling learning companion robot with a sprout / Fellow 學伴吉祥物：頭頂嫩芽、微笑的學習陪伴機器人" width="280" />
@@ -133,7 +133,7 @@ Python packages live in `.venv/`; runtime data and logs live in `runtime/local-d
 
 ## Project Demo
 
-- [Technical documentation for judges](docs/README.md): architecture, frontend and backend specifications, API contracts, deployment, and verification records, with supplementary HTML/PDF feature guides in Traditional Chinese.
+- [Judge reference guide](docs/README.md): the complete product story, illustrations, hydrogen-bond teaching example, and walkthroughs of all five core features, with technical documentation and HTML/PDF guides in Traditional Chinese.
 
 | Feature guide | Document |
 | --- | --- |
